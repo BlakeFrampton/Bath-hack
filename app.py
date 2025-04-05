@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, Q
 from PySide6.QtCore import Qt
 
 from typingBox import TypingBox
+from Timer import Timer
 
 default_button_bg = "4caf50"  # hex value
 
@@ -44,7 +45,6 @@ class HomeWidget(QWidget):
     def __init__(self):
         super().__init__()
 
-
     def reset(self):
         return
 
@@ -77,8 +77,12 @@ class MainWindow(QMainWindow):
         self.create_menu()
 
     def enter_typing(self):
-        text_edit = TypingBox(self.timeout, self.word_count, self.generation_type, self.generation_type_content)
+        text_edit = TypingBox(
+                              self.word_count,
+                              self.generation_type,
+                              self.generation_type_content)
         self.setCentralWidget(text_edit)
+        self.Timer = Timer(parent=self, runtime_seconds=30, position=(0, 200))
         self.current_widget_page = text_edit
 
     def enter_home(self):
@@ -172,13 +176,11 @@ class MainWindow(QMainWindow):
         settings_menu.addAction(word_count_action)
 
     def add_text_theme_menu(self, menu_bar):
-        text_theme_menu = menu_bar.addMenu(QIcon("assets/settings_icon.png"),
+        text_theme_menu = menu_bar.addMenu(QIcon("assets/generation_icon.png"),
                                            "Settings")
 
         def make_action(label):
-            # action = QAction(QIcon(f"assets/{label}_icon.png"), label.capitalize(), self)
-            action = QAction(QIcon("assets/settings_icon.png"),
-                             label.capitalize(), self)
+            action = QAction(QIcon(f"assets/{label}_icon.png"), label.capitalize(), self)
             action.triggered.connect(lambda: self.set_theme_from_input(label))
             return action
 
@@ -195,6 +197,7 @@ class MainWindow(QMainWindow):
             dialog.setLabelText(f"Enter your {style_type}:")
         dialog.setInputMode(QInputDialog.TextInput)
         dialog.setTextEchoMode(QLineEdit.Normal)
+        dialog.setWindowIcon(QIcon(f"assets/{style_type}_icon.png"))
 
         if dialog.exec():  # Show dialogue
             user_input = dialog.textValue()
