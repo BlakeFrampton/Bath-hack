@@ -20,7 +20,8 @@ class SliderWindow(QDialog):
 
         layout = QVBoxLayout(self)
 
-        self.setTextColor(QColor("white"))  #Default font color is white
+        defaultFontColour = "#A7F1CE"
+        self.setTextColor(QColor(defaultFontColour))  #Default font color
 
         self.text = text
 
@@ -56,11 +57,11 @@ class HomeWidget(QWidget):
 
 class MainWindow(QMainWindow):
     def __init__(self):
-        backgroundColour = "#080E4B"
+        self.backgroundColour = "#2E4057"
         super().__init__()
         self.setWindowTitle("Error 404")
         self.setGeometry(100, 100, 800, 600)
-        self.setStyleSheet(f'QMainWindow {{background: {backgroundColour}}}')
+        self.setStyleSheet(f'QMainWindow {{background: {self.backgroundColour}}}')
 
         # saves the current page
         self.timer = Timer(parent=self, runtime_seconds=30, position=(200, 0), timeout=self.timeout)
@@ -83,12 +84,16 @@ class MainWindow(QMainWindow):
         self.create_menu()
 
     def enter_typing(self):
+        text = "some text about catapults"
         text_edit = TypingBox(
+                              self.timeout,
+                              self.timer,
                               self.word_count,
                               self.generation_type,
                               self.generation_type_content,
-                              self.timeout,
-                              self.timer)
+                              use_text=text
+                              )
+        text_edit.setStyleSheet("margin: 100px 50px 100px 50px")
         self.setCentralWidget(text_edit)
 
         self.timer.show()
@@ -131,10 +136,20 @@ class MainWindow(QMainWindow):
         home_layout = QVBoxLayout()
         # title
         title_text = QLabel("Typesmith", self)
+        title_text.setFont(QFont("Times", 100))
+        title_text.setStyleSheet("color: white")
         title_text.setAlignment(Qt.AlignCenter)
         home_layout.addWidget(title_text)
+
+        def reset_title():
+            return
+
+        # title_text = TypingBox(reset_title, )
+
         # typing game
         typing_button = QPushButton("Typing Frenzy", self)
+        typing_button.setFont(QFont("Times", 100))
+        typing_button.setStyleSheet(f"color: white; background-color: '#3F5878'")
         typing_button.clicked.connect(self.enter_typing)
         home_layout.addWidget(typing_button)
         # create home screen
@@ -175,7 +190,7 @@ class MainWindow(QMainWindow):
         restart_action.triggered.connect(self.restart)
         file_menu.addAction(restart_action)
 
-        exit_action = QAction("Exit", self)
+        exit_action = QAction(QIcon("assets/exit_icon.png"), "Exit", self)
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
 
@@ -249,6 +264,8 @@ class MainWindow(QMainWindow):
 
     def create_menu(self):
         menu_bar = self.menuBar()
+        menu_bar.setStyleSheet(f"QMenuBar {{background:'#3F5878'}}")#
+        menu_bar.setFixedHeight(40)
 
         home_action = QAction(QIcon("assets/home_icon.png"), "Home", self)
         home_action.triggered.connect(self.enter_home)
