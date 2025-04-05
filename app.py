@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtGui import QFont, QIcon, QAction, QColor
+from PySide6.QtGui import QBrush, QFont, QIcon, QAction, QColor
 from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QDialog, QSlider, QVBoxLayout, QLabel, QInputDialog, QLineEdit
 from PySide6.QtCore import Qt, QTimer
 
@@ -93,7 +93,10 @@ class MainWindow(QMainWindow):
                               self.generation_type_content,
                               use_text=text
                               )
-        text_edit.setStyleSheet("margin: 100px 50px 100px 50px")
+        text_edit.setStyleSheet("""margin: 100px 50px 100px 50px
+            ; border-radius: 20px;
+            border: 2px solid black;
+            background-color: palette(base)""")
         self.setCentralWidget(text_edit)
 
         self.timer.show()
