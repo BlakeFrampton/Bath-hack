@@ -29,7 +29,13 @@ class TypingBox(QTextEdit):
         self.mistakesOverride = False
 
         # timer
-        self.timer = Timer(10, self, timeout_func, False, (200, 0))
+        self.timeout_func = timeout_func
+        self.timer = Timer(10, self, self.end_typing, False, (200, 0))
+
+    def end_typing(self):
+        # self.typed, self._textToType, self.correct, self.mistakes
+
+        self.timeout_func()
 
     def set_font(self, font):
         self.timer.setFont(font)
@@ -107,7 +113,7 @@ class TypingBox(QTextEdit):
         if pos == len(self._textToType):
             cursor.setPosition(0)  # Loop Back
             self.setTextCursor(cursor)
-            finishedTest(self.typed, self._textToType, self.correct, self.mistakes)
+            self.end_typing()
             self.streak = 0
             self.correct = 0
             self.mistakes = 0
@@ -151,10 +157,6 @@ class TypingBox(QTextEdit):
             return textGenerator.getTextFromNotes(generation_type_content, difficultWords, word_count)
         else:
             print("uh oh, that's not a valid generation type. What's going on?")
-
-
-def finishedTest(typed: str, target: str, correct: int, mistakes: int):
-    pass
 
 
 if __name__ == "__main__":
