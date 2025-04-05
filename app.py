@@ -254,6 +254,7 @@ class MainWindow(QMainWindow):
 
     def create_menu(self):
         menu_bar = self.menuBar()
+        menu_bar.setStyleSheet(f"QMenuBar {{background:'#3F5878'}}")
 
         home_action = QAction(QIcon("assets/home_icon.png"), "Home", self)
         home_action.triggered.connect(self.enter_home)
