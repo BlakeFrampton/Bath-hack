@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 class TypingBox(QTextEdit):
 
-    def __init__(self, word_count, generation_type, generation_type_content, end_type_func, **_):
+    def __init__(self, word_count, generation_type, generation_type_content, end_type_func, timer, **_):
         super().__init__()
 
         backgroundColour = "#5475A0"
@@ -33,6 +33,7 @@ class TypingBox(QTextEdit):
 
         # timer
         self.end_type_func = end_type_func
+        self.timer = timer
 
         # set cursor to the start
         cursor = self.textCursor()
@@ -44,6 +45,9 @@ class TypingBox(QTextEdit):
 
     def get_text_to_type(self):
         return self._textToType
+
+    def get_correct(self):
+        return self.correct
 
     def end_typing(self):
         # self.typed, self._textToType, self.correct, self.mistakes
@@ -80,6 +84,8 @@ class TypingBox(QTextEdit):
         pos = cursor.position()
 
         self.smoothScroll()
+
+        self.timer.unpause()
 
         try:
             if e.text() == self._textToType[pos]:  # If input is correct

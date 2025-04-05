@@ -88,37 +88,40 @@ class MainWindow(QMainWindow):
                               self.word_count,
                               self.generation_type,
                               self.generation_type_content,
-                              self.timeout)
+                              self.timeout,
+                              self.timer)
         self.setCentralWidget(text_edit)
 
         self.timer.show()
-        self.timer.unpause()
         self.timer.restart()
+        self.timer.pause()
 
         self.current_widget_page = text_edit
         QTimer.singleShot(0, text_edit.setFocus) #Focuses typing test after it has loaded
 
     def get_statistics(self):
         mistakes = self.current_widget_page.get_mistakes()
-        text_to_type = self.current_widget_page.get_text_to_type()
-        num_chars = len(text_to_type)
+        correct = self.current_widget_page.get_correct()
         minutes_taken = self.timer.elapsed_time / 60
+        total_typed = mistakes + correct
 
-        accuracy = (1 - mistakes / num_chars) * 100
+        accuracy = (1 - mistakes / total_typed) * 100
         accuracy = max(accuracy, 0)  # Ensure accuracy doesn't go below 0%
         final_accuracy = round(accuracy, 1)
 
-        wpm = (num_chars / 6) * (accuracy / 100) / minutes_taken
-        final_wpm = round(wpm)
+        print(self.timer.elapsed_time, correct, final_accuracy)
 
-        print("Final accuracy: " + str(final_accuracy))
-        print("Final wpm: " + str(final_wpm))
+        wpm = (correct / 6) * (final_accuracy / 100) / minutes_taken
+        final_wpm = round(wpm)
 
         return final_accuracy, final_wpm
 
     def timeout(self):
         # calculate statistics
         accuracy, wpm = self.get_statistics()
+
+        print("Final accuracy: " + str(accuracy))
+        print("Final wpm: " + str(wpm))
 
         # go back to the home screen
         self.enter_home()
