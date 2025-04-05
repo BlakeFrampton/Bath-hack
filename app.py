@@ -57,11 +57,11 @@ class HomeWidget(QWidget):
 
 class MainWindow(QMainWindow):
     def __init__(self):
-        backgroundColour = "#2E4057"
+        self.backgroundColour = "#2E4057"
         super().__init__()
         self.setWindowTitle("Error 404")
         self.setGeometry(100, 100, 800, 600)
-        self.setStyleSheet(f'QMainWindow {{background: {backgroundColour}}}')
+        self.setStyleSheet(f'QMainWindow {{background: {self.backgroundColour}}}')
 
         # saves the current page
         self.timer = Timer(parent=self, runtime_seconds=30, position=(200, 0), timeout=self.timeout)
@@ -132,10 +132,14 @@ class MainWindow(QMainWindow):
         home_layout = QVBoxLayout()
         # title
         title_text = QLabel("Typesmith", self)
+        title_text.setFont(QFont("Times", 100))
+        title_text.setStyleSheet("color: white")
         title_text.setAlignment(Qt.AlignCenter)
         home_layout.addWidget(title_text)
         # typing game
         typing_button = QPushButton("Typing Frenzy", self)
+        typing_button.setFont(QFont("Times", 100))
+        typing_button.setStyleSheet(f"color: white; background-color: {self.backgroundColour}")
         typing_button.clicked.connect(self.enter_typing)
         home_layout.addWidget(typing_button)
         # create home screen
