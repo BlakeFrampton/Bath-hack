@@ -6,6 +6,7 @@ import textGenerator
 import sys
 from dotenv import load_dotenv
 
+
 class TypingBox(QTextEdit):
 
     def __init__(self, timeout_func, word_count, generation_type, generation_type_content, **_):
@@ -13,18 +14,19 @@ class TypingBox(QTextEdit):
 
         backgroundColour = "#282E78"
         self.setStyleSheet(f'background-color: {backgroundColour}')
+        self.setFocus()
 
         load_dotenv()
         self.streak = 0
         self.mistakes = 0
         self.correct = 0
         self.typed = ""
-        textToType = self.getText(word_count, generation_type, generation_type_content)
+        textToType = self.getText(word_count,
+                                  generation_type, generation_type_content)
         self.setTextToType(textToType)
         self.setFont(QFont("Times", 50, QFont.Bold))
         # self.setTextToType("""In ancient times, the invention of the catapult revolutionized warfare. This powerful siege engine could launch projectiles with incredible force, causing devastation to enemy fortifications. The sound of the catapult releasing was a loud noise that struck fear into the hearts of those under attack. Additionally, when the projectiles hit their target, clouds of smoke and dust would fill the air. The catapult's ability to hurl heavy objects over long distances made it a formidable weapon in countless battles throughout history.""")
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        # self.setOverwriteMode(True)
         self.mistakesOverride = False
 
         # timer
@@ -80,15 +82,16 @@ class TypingBox(QTextEdit):
                     self.backspace(cursor, pos, format)
             elif ord(e.text()) == 127:  # Ctrl-backspace
                 startingSpace = False
-                if self._textToType[pos - 1] == " ":  # If pressed while on a space
-                    # delete from space to start of previous word
+                if self._textToType[pos - 1] == " ":  # If pressed while on a
+                    # space delete from space to start of previous word
                     startingSpace = True
-                while startingSpace or (pos > 0 and self._textToType[pos - 1] != " "):
+                while startingSpace or (pos > 0 and
+                                        self._textToType[pos - 1] != " "):
                     # Backspace until start of text or word
                     startingSpace = False
                     self.backspace(cursor, pos, format)
                     pos = cursor.position()
-            elif e.key() == Qt.Key_Backtab: #Shift + tab
+            elif e.key() == Qt.Key_Backtab:  # Shift + tab
                 self.reset()
             else:
                 self.mistakes += 1
@@ -106,7 +109,8 @@ class TypingBox(QTextEdit):
         if pos == len(self._textToType):
             cursor.setPosition(0)  # Loop Back
             self.setTextCursor(cursor)
-            finishedTest(self.typed, self._textToType, self.correct, self.mistakes)
+            finishedTest(self.typed, self._textToType,
+                         self.correct, self.mistakes)
             self.streak = 0
             self.correct = 0
             self.mistakes = 0
@@ -143,11 +147,14 @@ class TypingBox(QTextEdit):
     def getText(self, word_count, generation_type, generation_type_content):
         difficultWords = ["cappuccino", "spring", "crisp", "establishment"]
         if generation_type == "theme":
-            return textGenerator.getTextFromTheme(generation_type_content, difficultWords, word_count)
+            return textGenerator.getTextFromTheme(generation_type_content,
+                                                  difficultWords, word_count)
         elif generation_type == "code":
-            return textGenerator.getTextFromCode(generation_type_content, difficultWords, word_count)
+            return textGenerator.getTextFromCode(generation_type_content,
+                                                 difficultWords, word_count)
         elif generation_type == "notes":
-            return textGenerator.getTextFromNotes(generation_type_content, difficultWords, word_count)
+            return textGenerator.getTextFromNotes(generation_type_content,
+                                                  difficultWords, word_count)
         else:
             print("uh oh, that's not a valid generation type. What's going on?")
 
