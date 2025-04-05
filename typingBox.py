@@ -14,6 +14,9 @@ class TypingBox(QTextEdit):
 
         load_dotenv()
         self.setFont(QFont("Times", 18, QFont.Bold))
+        self.streak = 0
+        self.mistake = 0
+        self.correct = 0
         self.setTextToType("Multiple test words")
         # textToType = self.getText()
         # self.setTextToType(textToType)
@@ -25,10 +28,8 @@ class TypingBox(QTextEdit):
         cursor = self.textCursor()
         pos = cursor.position()
         format = QTextCharFormat()
-        mistake = 0
-        correct = 0
 
-
+        print("streak: ", self.streak)
         if e.text() == self._textToType[pos]:
             format.setForeground(QBrush(QColor("green")))
             cursor.deleteChar()
@@ -36,7 +37,8 @@ class TypingBox(QTextEdit):
             cursor.insertText(e.text())
             cursor.setPosition(pos + 1)
             pos += 1
-            correct += 1
+            self.correct += 1
+            self.streak += 1
         elif ord(e.text()) == 8:  # Backspace
             if pos > 0:
                 self.backspace(cursor, pos, format, e)
@@ -50,7 +52,8 @@ class TypingBox(QTextEdit):
                 pos = cursor.position()
         else:
             print((e.text().isprintable()))
-            mistake += 1
+            self.mistake += 1
+            self.streak = 0
             format.setForeground(QBrush(QColor("red")))
             cursor.deleteChar()
             cursor.setCharFormat(format)
@@ -61,7 +64,10 @@ class TypingBox(QTextEdit):
         if pos == len(self._textToType):
             cursor.setPosition(0)  # Loop Back
             self.setTextCursor(cursor)
-            finishedTest(self.toPlainText(), self._textToType)
+            finishedTest(self.toPlainText(), self._textToType, self.correct, self.mistakes)
+            self.streak = 0
+            self.correct = 0
+            self.mistakes = 0
 
     def backspace(self, cursor, pos, format, e):
         indx = (pos - 1) % len(self._textToType)
