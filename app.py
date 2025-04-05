@@ -137,8 +137,7 @@ class MainWindow(QMainWindow):
         self.create_menu()
 
     def enter_typing(self):
-        text_edit = TypingBox(self.timeout)
-
+        text_edit = TypingBox(self.timeout, self.word_count, self.generation_type, self.generation_type_content)
         self.setCentralWidget(text_edit)
         self.current_widget_page = text_edit
 
