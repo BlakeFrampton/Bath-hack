@@ -1,7 +1,6 @@
 from PySide6.QtGui import (QBrush, QColor, QFont, QKeyEvent,
                            QMouseEvent, QTextCharFormat, Qt)
 from PySide6.QtWidgets import QApplication, QTextEdit
-from Timer import Timer
 import textGenerator
 import sys
 from dotenv import load_dotenv
@@ -9,7 +8,7 @@ from dotenv import load_dotenv
 
 class TypingBox(QTextEdit):
 
-    def __init__(self, timeout_func, word_count, generation_type, generation_type_content, **_):
+    def __init__(self,word_count, generation_type, generation_type_content, **_):
         super().__init__()
 
         backgroundColour = "#282E78"
@@ -29,8 +28,6 @@ class TypingBox(QTextEdit):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.mistakesOverride = False
 
-        # timer
-        self.timer = Timer(10, self, timeout_func, False, (200, 0))
 
     def set_font(self, font):
         self.timer.setFont(font)

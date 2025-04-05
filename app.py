@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, Q
 from PySide6.QtCore import Qt
 
 from typingBox import TypingBox
+from Timer import Timer
 
 default_button_bg = "4caf50"  # hex value
 
@@ -76,11 +77,12 @@ class MainWindow(QMainWindow):
         self.create_menu()
 
     def enter_typing(self):
-        text_edit = TypingBox(self.timeout,
+        text_edit = TypingBox(
                               self.word_count,
                               self.generation_type,
                               self.generation_type_content)
         self.setCentralWidget(text_edit)
+        self.Timer = Timer(parent=self, runtime_seconds=30, position=(0, 200))
         self.current_widget_page = text_edit
 
     def enter_home(self):
