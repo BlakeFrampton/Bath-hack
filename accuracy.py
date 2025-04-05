@@ -9,6 +9,7 @@ target_message = "The quick brown fox jumps over the lazy dog."
 # Variable to store the typed text and the number of mistakes
 typed_text = ""
 mistakes = 0
+wrongIndexList = []
 
 # Function to calculate final accuracy
 def calculate_accuracy(mistakes, target):
@@ -24,15 +25,19 @@ def capture_typing():
     # Get the current text in the input field
     typed_text = input_field.text()
 
-    # Reset mistakes count
-    mistakes = 0
+     #Counts mistakes 
+    minLen = min(len(typed_text), len(target_message))
+    if minLen != 0:
+        for i in range(minLen):
+            if typed_text[i] == target_message[i]: 
+                if i in wrongIndexList: 
+                    wrongIndexList.remove(i)
+            elif typed_text[minLen -1] != target_message[minLen -1] and minLen -1 not in wrongIndexList:
+                wrongIndexList.append(minLen -1)
+                mistakes += 1
 
-    # Count the mistakes (comparing each character)
-    for i in range(min(len(typed_text), len(target_message))):
-        if typed_text[i] != target_message[i]:
-            mistakes += 1
-
-    # Display the mistakes in the label
+    
+    # Display the mistakes in the label delete after 
     mistakes_label.setText(f"Mistakes so far: {mistakes}")
 
 # Function to handle the final calculation when the user presses Enter
