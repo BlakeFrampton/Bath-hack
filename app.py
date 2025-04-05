@@ -61,6 +61,10 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(f'QMainWindow {{background: {backgroundColour}}}')
 
         # saves the current page
+        self.timer = Timer(parent=self, runtime_seconds=30, position=(200, 0), timeout=self.timeout)
+        self.timer.pause()
+        self.timer.hide()
+
         self.current_widget_page = None
         self.enter_home()
 
@@ -80,12 +84,43 @@ class MainWindow(QMainWindow):
         text_edit = TypingBox(
                               self.word_count,
                               self.generation_type,
-                              self.generation_type_content)
+                              self.generation_type_content,
+                              self.timeout)
         self.setCentralWidget(text_edit)
-        self.Timer = Timer(parent=self, runtime_seconds=30, position=(0, 200))
+
+        self.timer.show()
+        self.timer.unpause()
+        self.timer.restart()
+
         self.current_widget_page = text_edit
         QTimer.singleShot(0, text_edit.setFocus) #Focuses typing test after it has loaded
 
+
+    def get_statistics(self):
+        mistakes = self.current_widget_page.get_mistakes()
+        text_to_type = self.current_widget_page.get_text_to_type()
+        num_chars = len(text_to_type)
+        minutes_taken = self.timer.elapsed_time / 60
+
+        accuracy = (1 - mistakes / num_chars) * 100
+        accuracy = max(accuracy, 0)  # Ensure accuracy doesn't go below 0%
+        final_accuracy = round(accuracy, 1)
+
+        wpm = (num_chars / 6) * (accuracy / 100) / minutes_taken
+        final_wpm = round(wpm)
+
+        print("Final accuracy: " + str(final_accuracy))
+        print("Final wpm: " + str(final_wpm))
+
+        return final_accuracy, final_wpm
+
+    def timeout(self):
+        # calculate statistics
+        accuracy, wpm = self.get_statistics()
+
+        # go back to the home screen
+        self.enter_home()
+        print("timeout")
 
     def enter_home(self):
         # home screen
@@ -106,10 +141,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(home_screen)
         self.current_widget_page = home_screen
 
-    def timeout(self):
-        # go back to the home screen
-        self.enter_home()
-        print("timeout")
+        self.timer.pause()
+        self.timer.hide()
 
     def set_volume(self, value):
         print("set volume to", value)

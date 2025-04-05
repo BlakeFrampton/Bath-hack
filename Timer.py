@@ -26,6 +26,12 @@ class Timer:
 
         self.paused = False
 
+    def hide(self):
+        self.timer_label.hide()
+
+    def show(self):
+        self.timer_label.show()
+
     def pause(self):
         self.paused = True
 
