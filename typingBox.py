@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 class TypingBox(QTextEdit):
 
-    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="computer science hackathon", use_text="", difficultWords = [], difficultScores = [], **_):
+    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="computer science hackathon", use_text="", key_function = None, difficultWords = [], difficultScores = [], **_):
         super().__init__()
 
         backgroundColour = "#5475A0"
@@ -40,6 +40,8 @@ class TypingBox(QTextEdit):
         #Creating arrays for difficult words 
         self.newDiffWords = []
 
+        # key function - activated whenever a key is pressed
+        self.key_function = key_function
 
         # timer
         self.end_type_func = end_type_func
@@ -64,7 +66,6 @@ class TypingBox(QTextEdit):
         text = self._textToType[0:self.pos]
 
 
-
         # call the function for when the typing is finished
         self.end_type_func(self.difficultWords)
 
@@ -85,9 +86,10 @@ class TypingBox(QTextEdit):
         # remove the current text
         format = QTextCharFormat()
         format.setForeground(QBrush(QColor("white")))
-        cursor = self.textCursor()
-        while cursor.position() > 0:
-            self.backspace(cursor, cursor.position(), format)
+        while True:
+            self.backspace()
+            if self.textCursor().position() <= 0:
+                break
 
     def keyPressEvent(self, e: QKeyEvent) -> None:
         cursor = self.textCursor()
@@ -97,7 +99,7 @@ class TypingBox(QTextEdit):
 
         self.smoothScroll()
 
-        self.timer.unpause()
+        self.key_function()
 
         print("before try")
         try:
@@ -114,7 +116,7 @@ class TypingBox(QTextEdit):
                 self.streak += 1
             elif ord(e.text()) == 8:  # Backspace
                 if self.pos > 0:
-                    self.backspace(cursor, self.pos, format)
+                    self.backspace()
             elif ord(e.text()) == 127:  # Ctrl-backspace
                 startingSpace = False
                 if self._textToType[self.pos - 1] == " ":  # If pressed while on a
@@ -124,7 +126,8 @@ class TypingBox(QTextEdit):
                                         self._textToType[self.pos - 1] != " "):
                     # Backspace until start of text or word
                     startingSpace = False
-                    self.backspace(cursor, self.pos, format)
+                    self.backspace()
+                    cursor = self.textCursor()
                     self.pos = cursor.position()
             elif e.key() == Qt.Key_Backtab:  # Shift + tab
                 self.reset()
@@ -196,9 +199,9 @@ class TypingBox(QTextEdit):
             pass
 
         if self.pos == len(self._textToType):
+            self.end_typing()
             cursor.setPosition(0)  # Loop Back
             self.setTextCursor(cursor)
-            self.end_typing()
             self.streak = 0
             self.correct = 0
             self.mistakes = 0
@@ -209,7 +212,9 @@ class TypingBox(QTextEdit):
             scrollBar = self.verticalScrollBar()
             scrollBar.setValue(scrollBar.value() + 20)
 
-    def backspace(self, cursor, pos):
+    def backspace(self):
+        cursor = self.textCursor()
+        pos = cursor.position()
         format = QTextCharFormat()
 
         indx = (pos - 1) % len(self._textToType)

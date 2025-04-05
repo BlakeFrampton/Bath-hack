@@ -1,3 +1,4 @@
+from os import WCOREDUMP
 import sys
 from PySide6.QtGui import QBrush, QFont, QIcon, QAction, QColor
 from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QDialog, QSlider, QVBoxLayout, QLabel, QInputDialog, QLineEdit
@@ -95,7 +96,8 @@ class MainWindow(QMainWindow):
                               self.word_count,
                               self.generation_type,
                               self.generation_type_content,
-                              use_text=text
+                              use_text=text,
+                              key_function=self.timer.unpause
                               )
         text_edit.setStyleSheet("""margin: 100px 50px 100px 50px
             ; border-radius: 20px;
@@ -104,6 +106,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(text_edit)
 
         self.timer.show()
+        self.timer.runtime_seconds = 60  # one minute to get through the test
+        self.timer.restart_on_timeout = False
         self.timer.restart()
         self.timer.pause()
 
@@ -123,40 +127,71 @@ class MainWindow(QMainWindow):
         print(self.timer.elapsed_time, correct, final_accuracy)
 
         wpm = (correct / 6) * (final_accuracy / 100) / minutes_taken
-        final_wpm = round(wpm)
+        score = round(wpm)
 
-        return final_accuracy, final_wpm
+        return round(final_accuracy, 2), round(wpm), round(score, 1)
 
     def timeout(self, difficultWords):
         # calculate statistics
-        accuracy, wpm = self.get_statistics()
-        print(difficultWords)
+        accuracy, wpm, score = self.get_statistics()
 
         print("Final accuracy: " + str(accuracy))
         print("Final wpm: " + str(wpm))
-        
-        #Create a new function to get the difficult words, current words etccc all needs to go here
-        
-
+        print("Final score: " + str(score))
 
         # go back to the home screen
-        self.enter_home()
+        self.enter_home(accuracy, wpm, score)
         print("timeout")
 
-    def enter_home(self):
+    def make_type_box_title(self, home_layout):
+        self.timer.pause()
+        self.timer.runtime_seconds = 20
+        self.timer.restart_on_timeout = True
+        self.timer.hide()
+
+        title_text = TypingBox(None, self.timer, key_function=self.timer.restart, use_text="Typesmith")
+        title_text.setGeometry(0, 0, self.width(), 20)
+        self.timer.timeout_function = title_text.backspace
+        self.timer.restart()
+
+        def reset_title():
+            print("reset!!!!!")
+            title_text.reset()
+
+        title_text.end_type_func = reset_title
+
+        title_text.setFont(QFont("Times", 100))
+        title_text.setStyleSheet("color: white;margin: 100")
+        title_text.setAlignment(Qt.AlignCenter)
+
+        home_layout.addWidget(title_text)
+
+    def make_data_display_boxes(self, home_layout, accuracy=None, wpm=None, score=None):
+        if accuracy is not None and wpm is not None and score is not None:
+            accuracy_text = QLabel(str(accuracy)+"%", self)
+            accuracy_text.setFont(QFont("Times", 50))
+            accuracy_text.setAlignment(Qt.AlignCenter)
+
+            wpm_text = QLabel(str(wpm)+" wpm", self)
+            wpm_text.setFont(QFont("Times", 50))
+            wpm_text.setAlignment(Qt.AlignCenter)
+
+            score_text = QLabel("Score: "+str(score), self)
+            score_text.setFont(QFont("Times", 50))
+            score_text.setAlignment(Qt.AlignCenter)
+
+            home_layout.addWidget(accuracy_text)
+            home_layout.addWidget(wpm_text)
+            home_layout.addWidget(score_text)
+
+    def enter_home(self, accuracy=None, wpm=None, score=None):
         # home screen
         home_layout = QVBoxLayout()
         # title
-        title_text = QLabel("Typesmith", self)
-        title_text.setFont(QFont("Times", 100))
-        title_text.setStyleSheet("color: white")
-        title_text.setAlignment(Qt.AlignCenter)
-        home_layout.addWidget(title_text)
+        # title_text = QLabel("Typesmith", self)
 
-        def reset_title():
-            return
-
-        # title_text = TypingBox(reset_title, )
+        self.make_type_box_title(home_layout)
+        self.make_data_display_boxes(home_layout, accuracy, wpm, score)
 
         # typing game
         typing_button = QPushButton("Typing Frenzy", self)
