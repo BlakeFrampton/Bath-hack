@@ -21,7 +21,7 @@ class SliderWindow(QDialog):
         layout = QVBoxLayout(self)
 
         defaultFontColour = "#A7F1CE"
-        self.setTextColor(QColor(defaultFontColour))  #Default font color is white
+        self.setTextColor(QColor(defaultFontColour))  #Default font color
 
         self.text = text
 
