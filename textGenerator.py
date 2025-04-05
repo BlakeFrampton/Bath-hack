@@ -15,7 +15,7 @@ print("start")
 
 
 
-def getTextToType(theme, wordsToInclude, targetLength, isCode):
+def getTextToType(theme, wordsToInclude, targetLength, isCode, apiKey):
     systemPrompt = "You are in charge of generating text for a typing test. You should follow any themes, and word limits as closely as possible. YOU MUST include all words in the given list of tricky words. Having tricky words show up multiple times is ideal, but the most important thing is that they appear at least once or the user will be severely, emotionally hurt. You should aim to make your output educational on the chosen subject."
     prompt = ""
     if isCode:
@@ -23,8 +23,10 @@ def getTextToType(theme, wordsToInclude, targetLength, isCode):
     else:
         userPrompt = f'Generate n {targetLength} word passage containg all the difficult words {wordsToInclude}. You MUST include every word in {wordsToInclude}.  If you are missing one of these words, our program will be in serious risk of begin shut down and we will not be able to pay our rent. The passage should follow the theme {theme}.'
     
+
+    print(apiKey)
     client = OpenAI(
-        api_key= os.environ.get("OPENAI_KEY"),
+        api_key= apiKey,
         base_url="https://hack.funandprofit.ai/api/providers/openai/v1"
     )
     response = client.chat.completions.create(
@@ -37,7 +39,7 @@ def getTextToType(theme, wordsToInclude, targetLength, isCode):
     reply = response.choices[0].message.content
     return reply
 
-difficultWords = ['hydroxide', 'glucose', 'cowabunga', 'orange']
-theme = "dogs"
-targetLength = 50
-getTextToType(theme, difficultWords, targetLength, False)
+# difficultWords = ['hydroxide', 'glucose', 'cowabunga', 'orange']
+# theme = "dogs"
+# targetLength = 50
+# getTextToType(theme, difficultWords, targetLength, False, )

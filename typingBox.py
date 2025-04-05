@@ -1,19 +1,24 @@
 from PySide6.QtGui import (QBrush, QColor, QFont, QKeyEvent,
                            QMouseEvent, QTextCharFormat)
 from PySide6.QtWidgets import QApplication, QTextEdit
+from textGenerator import getTextToType
 import sys
+import os
+from dotenv import load_dotenv
 
 
 class TypingBox(QTextEdit):
 
     def __init__(self, **_):
         super().__init__()
-        self.setFont(QFont("Times", 50, QFont.Bold))
+
+        load_dotenv()
+        self.setFont(QFont("Times", 18, QFont.Bold))
         self.setTextToType("Test")
+        # textToType = self.getText()
+        # self.setTextToType(textToType)
         self.setOverwriteMode(True)
 
-    def mousePressEvent(self, _: QMouseEvent, /) -> None:
-        pass
 
     def keyPressEvent(self, e: QKeyEvent) -> None:
         cursor = self.textCursor()
@@ -21,6 +26,7 @@ class TypingBox(QTextEdit):
         format = QTextCharFormat()
         mistake = 0
         correct = 0
+
 
         if e.text() == self._textToType[pos]:
             format.setForeground(QBrush(QColor("green")))
@@ -63,6 +69,12 @@ class TypingBox(QTextEdit):
     def setTextToType(self, message: str) -> None:
         self._textToType = message
         return self.setText(message)
+
+    def getText(self):
+        targetLength = 50
+        theme = "coffee"
+        difficultWords = ["cappuccino", "spring", "crisp", "establishment"]
+        return getTextToType(theme, difficultWords, targetLength, True, os.environ.get("OPENAI_API_KEY"))
 
 
 if __name__ == "__main__":
