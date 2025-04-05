@@ -191,6 +191,7 @@ class MainWindow(QMainWindow):
             dialog.setLabelText(f"Enter your {style_type}:")
         dialog.setInputMode(QInputDialog.TextInput)
         dialog.setTextEchoMode(QLineEdit.Normal)
+        dialog.setWindowIcon(QIcon(f"assets/{style_type}_icon.png"))
 
         if dialog.exec():  # Show dialogue
             user_input = dialog.textValue()
