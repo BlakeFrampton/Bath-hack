@@ -91,7 +91,8 @@ class MainWindow(QMainWindow):
                               self.word_count,
                               self.generation_type,
                               self.generation_type_content,
-                              use_text=text
+                              use_text=text,
+                              key_function=self.timer.unpause
                               )
         text_edit.setStyleSheet("""margin: 100px 50px 100px 50px
             ; border-radius: 20px;
@@ -100,6 +101,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(text_edit)
 
         self.timer.show()
+        self.timer.runtime_seconds = 60  # one minute to get through the test
+        self.timer.restart_on_timeout = False
         self.timer.restart()
         self.timer.pause()
 
@@ -134,20 +137,38 @@ class MainWindow(QMainWindow):
         self.enter_home()
         print("timeout")
 
+    def make_type_box_title(self):
+        self.timer.pause()
+        self.timer.runtime_seconds = 20
+        self.timer.restart_on_timeout = True
+        self.timer.hide()
+
+        title_text = TypingBox(None, self.timer, key_function=self.timer.restart, use_text="Typesmith")
+        title_text.setGeometry(0, 0, self.width(), 20)
+        self.timer.timeout_function = title_text.backspace
+        self.timer.restart()
+
+        def reset_title():
+            print("reset!!!!!")
+            title_text.reset()
+
+        title_text.end_type_func = reset_title
+
+        title_text.setFont(QFont("Times", 100))
+        title_text.setStyleSheet("color: white;margin: 100")
+        title_text.setAlignment(Qt.AlignCenter)
+
+        return title_text
+
     def enter_home(self):
         # home screen
         home_layout = QVBoxLayout()
         # title
-        title_text = QLabel("Typesmith", self)
-        title_text.setFont(QFont("Times", 100))
-        title_text.setStyleSheet("color: white")
-        title_text.setAlignment(Qt.AlignCenter)
+        # title_text = QLabel("Typesmith", self)
+
+        title_text = self.make_type_box_title()
         home_layout.addWidget(title_text)
 
-        def reset_title():
-            return
-
-        # title_text = TypingBox(reset_title, )
 
         # typing game
         typing_button = QPushButton("Typing Frenzy", self)
