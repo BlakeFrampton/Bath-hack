@@ -39,6 +39,17 @@ class SliderWindow(QDialog):
         self.onChanged(value)
 
 
+class HomeWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+
+    def set_font(self, font):
+        self.setFont(font)
+
+    def reset(self):
+        return
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         backgroundColour = "#080E4B"
@@ -77,7 +88,7 @@ class MainWindow(QMainWindow):
         typing_button.clicked.connect(self.enter_typing)
         home_layout.addWidget(typing_button)
         # create home screen
-        home_screen = QWidget()
+        home_screen = HomeWidget()  # basically a QWidget, just with some extra functions
         home_screen.setLayout(home_layout)
 
         self.setCentralWidget(home_screen)
@@ -94,12 +105,11 @@ class MainWindow(QMainWindow):
         print("set text size to", value)
         self.text_size = value
         font = QFont("Times", value)
-        self.timer.setFont(font)
-        self.text_edit.setFont(font)
+
+        self.current_widget_page.set_font(font)
 
     def restart(self):
-        self.timer.restart()
-        self.text_edit.reset()
+        self.current_widget_page.reset()
         print("restart?")
 
     def add_file_menu(self, menu_bar):

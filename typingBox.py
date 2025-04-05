@@ -94,6 +94,10 @@ class TypingBox(QTextEdit):
         # timer
         self.timer = Timer(10, self, timeout_func, False, (200, 0))
 
+    def set_font(self, font):
+        self.timer.setFont(font)
+        self.setFont(font)
+
     def toggle_mistake_override(self):
         self.set_mistake_override(not self.mistakesOverride)
 
@@ -111,6 +115,9 @@ class TypingBox(QTextEdit):
         cursor = self.textCursor()
         while cursor.position() > 0:
             self.backspace(cursor, cursor.position(), format)
+
+        # reset the timer
+        self.timer.restart()
 
     def keyPressEvent(self, e: QKeyEvent) -> None:
         cursor = self.textCursor()
