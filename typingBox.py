@@ -123,6 +123,9 @@ class TypingBox(QTextEdit):
     def setTextToType(self, message: str) -> None:
         self._textToType = message
         return self.setText(message)
+    
+    def mousePressEvent(self, _: QMouseEvent, /) -> None:
+        pass
 
     def getText(self):
         targetLength = 200
