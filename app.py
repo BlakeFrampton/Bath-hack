@@ -84,7 +84,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(text_edit)
         self.Timer = Timer(parent=self, runtime_seconds=30, position=(0, 200))
         self.current_widget_page = text_edit
-        QTimer.singleShot(0, text_edit.setFocus)
+        QTimer.singleShot(0, text_edit.setFocus) #Focuses typing test after it has loaded
 
 
     def enter_home(self):
