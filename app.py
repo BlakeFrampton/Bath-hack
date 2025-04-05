@@ -1,7 +1,6 @@
-from os import WCOREDUMP
 import sys
 from PySide6.QtGui import QBrush, QFont, QIcon, QAction, QColor
-from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QDialog, QSlider, QVBoxLayout, QLabel, QInputDialog, QLineEdit
+from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QDialog, QSlider, QVBoxLayout, QHBoxLayout, QLabel, QInputDialog, QLineEdit
 from PySide6.QtCore import Qt, QTimer
 
 from typingBox import TypingBox
@@ -65,11 +64,12 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(f'QMainWindow {{background: {self.backgroundColour}}}')
 
         # saves the current page
-        self.timer = Timer(parent=self, runtime_seconds=30, position=(200, 0), timeout=self.timeout)
+        self.timer = Timer(parent=self, runtime_seconds=30, position=(500, 0), timeout=self.timeout)
         self.timer.pause()
         self.timer.hide()
 
         self.current_widget_page = None
+
         self.enter_home()
 
         # settings
@@ -102,7 +102,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(text_edit)
 
         self.timer.show()
-        self.timer.runtime_seconds = 60  # one minute to get through the test
+        self.timer.timeout_function = self.timeout
+        self.timer.runtime_seconds = 6  # one minute to get through the test
         self.timer.restart_on_timeout = False
         self.timer.restart()
         self.timer.pause()
@@ -137,48 +138,58 @@ class MainWindow(QMainWindow):
 
         # go back to the home screen
         self.enter_home(accuracy, wpm, score)
-        print("timeout")
 
     def make_type_box_title(self, home_layout):
         self.timer.pause()
-        self.timer.runtime_seconds = 20
+        self.timer.runtime_seconds = 1
         self.timer.restart_on_timeout = True
         self.timer.hide()
 
         title_text = TypingBox(None, self.timer, key_function=self.timer.restart, use_text="Typesmith")
-        title_text.setGeometry(0, 0, self.width(), 20)
-        self.timer.timeout_function = title_text.backspace
+        # title_text.setGeometry(0, 0, self.width(), 20)
+
+        def timeout_func():
+            print("timeout?")
+            title_text.backspace()
+
+        self.timer.timeout_function = timeout_func
+        self.timer.unpause()
         self.timer.restart()
+        self.timer.show()
 
-        def reset_title():
-            print("reset!!!!!")
-            title_text.reset()
+        print(self.timer.paused, self.timer.elapsed_time, self.timer.runtime_seconds)
 
-        title_text.end_type_func = reset_title
+        title_text.end_type_func = title_text.reset
 
         title_text.setFont(QFont("Times", 100))
-        title_text.setStyleSheet("color: white;margin: 100")
+        title_text.setStyleSheet(f"color: white;background-color: {self.backgroundColour}")
         title_text.setAlignment(Qt.AlignCenter)
 
         home_layout.addWidget(title_text)
 
     def make_data_display_boxes(self, home_layout, accuracy=None, wpm=None, score=None):
-        if accuracy is not None and wpm is not None and score is not None:
-            accuracy_text = QLabel(str(accuracy)+"%", self)
-            accuracy_text.setFont(QFont("Times", 50))
-            accuracy_text.setAlignment(Qt.AlignCenter)
+        if accuracy is None:
+            accuracy = "100"
+        if wpm is None:
+            wpm = "N/A"
+        if score is None:
+            score = "N/A"
 
-            wpm_text = QLabel(str(wpm)+" wpm", self)
-            wpm_text.setFont(QFont("Times", 50))
-            wpm_text.setAlignment(Qt.AlignCenter)
+        accuracy_text = QLabel(str(accuracy)+"%", self)
+        accuracy_text.setFont(QFont("Times", 50))
+        accuracy_text.setAlignment(Qt.AlignCenter)
 
-            score_text = QLabel("Score: "+str(score), self)
-            score_text.setFont(QFont("Times", 50))
-            score_text.setAlignment(Qt.AlignCenter)
+        wpm_text = QLabel(str(wpm)+" wpm", self)
+        wpm_text.setFont(QFont("Times", 50))
+        wpm_text.setAlignment(Qt.AlignCenter)
 
-            home_layout.addWidget(accuracy_text)
-            home_layout.addWidget(wpm_text)
-            home_layout.addWidget(score_text)
+        score_text = QLabel("Score: "+str(score), self)
+        score_text.setFont(QFont("Times", 50))
+        score_text.setAlignment(Qt.AlignCenter)
+
+        home_layout.addWidget(accuracy_text)
+        home_layout.addWidget(wpm_text)
+        home_layout.addWidget(score_text)
 
     def enter_home(self, accuracy=None, wpm=None, score=None):
         # home screen
@@ -307,7 +318,7 @@ class MainWindow(QMainWindow):
 
     def create_menu(self):
         menu_bar = self.menuBar()
-        menu_bar.setStyleSheet(f"QMenuBar {{background:'#3F5878'}}")#
+        menu_bar.setStyleSheet(f"QMenuBar {{background:'#3F5878'}}")
         menu_bar.setFixedHeight(40)
 
         home_action = QAction(QIcon("assets/home_icon.png"), "Home", self)
@@ -317,6 +328,9 @@ class MainWindow(QMainWindow):
         self.add_file_menu(menu_bar)
         self.add_settings_menu(menu_bar)
         self.add_text_theme_menu(menu_bar)
+
+        # raise the timer to the top of the widget stack
+        self.timer.timer_label.raise_()
 
 
 if __name__ == "__main__":
