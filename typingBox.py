@@ -14,7 +14,7 @@ class TypingBox(QTextEdit):
 
         load_dotenv()
         self.setFont(QFont("Times", 18, QFont.Bold))
-        self.setTextToType("Test")
+        self.setTextToType("Multiple test words")
         # textToType = self.getText()
         # self.setTextToType(textToType)
         self.setOverwriteMode(True)
@@ -38,17 +38,16 @@ class TypingBox(QTextEdit):
             pos += 1
             correct += 1
         elif ord(e.text()) == 8:  # Backspace
-            indx = (pos - 1) % len(self._textToType)
-            print(indx)
-            cursor.setPosition(indx)
-            cursor.deleteChar()
-            cursor.setCharFormat(format)
-            if self.mistakesOverride:
-                cursor.insertText(e.text())
-            else:
-                cursor.insertText(self._textToType[indx])
-            cursor.setPosition(indx)
-            self.setTextCursor(cursor)
+            if pos > 0:
+                self.backspace(cursor, pos, format, e)
+        elif ord(e.text()) == 127: # Ctrl-backspace
+            startingSpace = False
+            if self._textToType[pos - 1] == " ": # If pressed while on a space, delete from space to start of previous word
+                startingSpace = True
+            while startingSpace or (pos > 0 and self._textToType[pos - 1] != " "): # Backspace until start of text or word
+                startingSpace = False
+                self.backspace(cursor, pos, format, e)
+                pos = cursor.position()
         else:
             print((e.text().isprintable()))
             mistake += 1
@@ -64,6 +63,20 @@ class TypingBox(QTextEdit):
             self.setTextCursor(cursor)
             finishedTest(self.toPlainText(), self._textToType)
 
+    def backspace(self, cursor, pos, format, e):
+        indx = (pos - 1) % len(self._textToType)
+        print(indx)
+        cursor.setPosition(indx)
+        cursor.deleteChar()
+        cursor.setCharFormat(format)
+        if self.mistakesOverride:
+            cursor.insertText(e.text())
+        else:
+            cursor.insertText(self._textToType[indx])
+        cursor.setPosition(indx)
+        self.setTextCursor(cursor)
+
+    
     def insertFromMimeData(self, _) -> None:
         pass  # Disable Pasting
 
