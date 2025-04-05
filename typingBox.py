@@ -28,6 +28,23 @@ class TypingBox(QTextEdit):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.mistakesOverride = False
 
+        # timer
+        self.timeout_func = timeout_func
+
+    def end_typing(self):
+        # self.typed, self._textToType, self.correct, self.mistakes
+        accuracy = 0
+        accuracy = (1 - mistakes / len(target)) * 100
+        accuracy = max(accuracy, 0)  # Ensure accuracy doesn't go below 0%
+        final_accuracy = round(accuracy, 1)
+        
+        wpm = (len(target) / 6) * (accuracy / 100)
+        final_wpm = round(wpm)
+
+        print("Final accurcay: " + str(final_accuracy))
+        print("Final wpm: " + str(final_wpm))
+
+        self.timeout_func()
 
     def set_font(self, font):
         self.timer.setFont(font)
@@ -109,8 +126,7 @@ class TypingBox(QTextEdit):
         if pos == len(self._textToType):
             cursor.setPosition(0)  # Loop Back
             self.setTextCursor(cursor)
-            finishedTest(self.typed, self._textToType,
-                         self.correct, self.mistakes)
+            self.end_typing()
             self.streak = 0
             self.correct = 0
             self.mistakes = 0
@@ -157,19 +173,6 @@ class TypingBox(QTextEdit):
                                                   difficultWords, word_count)
         else:
             print("uh oh, that's not a valid generation type. What's going on?")
-
-
-def finishedTest(typed: str, target: str, correct: int, mistakes: int):
-    accuracy = 0
-    accuracy = (1 - mistakes / len(target)) * 100
-    accuracy = max(accuracy, 0)  # Ensure accuracy doesn't go below 0%
-    final_accuracy = round(accuracy, 1)
-    
-    wpm = (len(target) / 6) * (accuracy / 100)
-    final_wpm = round(wpm)
-
-    print("Final accurcay: " + str(final_accuracy))
-    print("Final wpm: " + str(final_wpm))
 
 
 if __name__ == "__main__":

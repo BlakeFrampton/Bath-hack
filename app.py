@@ -105,6 +105,8 @@ class MainWindow(QMainWindow):
         self.current_widget_page = home_screen
 
     def timeout(self):
+        # go back to the home screen
+        self.enter_home()
         print("timeout")
 
     def set_volume(self, value):
