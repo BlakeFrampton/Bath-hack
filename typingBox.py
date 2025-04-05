@@ -7,6 +7,7 @@ class TypingBox(QTextEdit):
 
     def __init__(self, **_):
         super().__init__()
+        self.setFont(QFont("Times", 50, QFont.Bold))
         self.setTextToType("Test")
         self.setOverwriteMode(True)
 
@@ -14,8 +15,6 @@ class TypingBox(QTextEdit):
         cursor = self.textCursor()
         pos = cursor.position()
         format = QTextCharFormat()
-        format.setFontWeight(QFont().bold())
-
 
         if e.text() == self._textToType[pos]:
             format.setForeground(QBrush(QColor("green")))
@@ -31,7 +30,7 @@ class TypingBox(QTextEdit):
             cursor.setCharFormat(format)
             cursor.insertText(e.text())
             cursor.setPosition(pos + 1)
-        
+
         if pos == len(self._textToType) - 1:
             cursor.setPosition(0)  # Loop Back
             self.setTextCursor(cursor)
