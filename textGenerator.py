@@ -35,7 +35,7 @@ def getTextToType(theme, wordsToInclude, targetLength, isCode):
         ]
     )
     reply = response.choices[0].message.content
-    print(reply)
+    return reply
 
 difficultWords = ['hydroxide', 'glucose', 'cowabunga', 'orange']
 theme = "dogs"
