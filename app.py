@@ -20,7 +20,8 @@ class SliderWindow(QDialog):
 
         layout = QVBoxLayout(self)
 
-        self.setTextColor(QColor("white"))  #Default font color is white
+        defaultFontColour = "#A7F1CE"
+        self.setTextColor(QColor(defaultFontColour))  #Default font color is white
 
         self.text = text
 
@@ -56,7 +57,7 @@ class HomeWidget(QWidget):
 
 class MainWindow(QMainWindow):
     def __init__(self):
-        backgroundColour = "#080E4B"
+        backgroundColour = "#2E4057"
         super().__init__()
         self.setWindowTitle("Error 404")
         self.setGeometry(100, 100, 800, 600)
