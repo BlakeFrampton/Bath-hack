@@ -1,6 +1,6 @@
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QTextEdit, QFileDialog, QDialog, QSlider, QVBoxLayout, QLabel, QMessageBox
-from PySide6.QtGui import QIcon, QAction, QPainter, QColor
+from PySide6.QtGui import QFont, QIcon, QAction, QPainter, QColor
 from PySide6.QtCore import QFile, QIODevice, QTextStream, Qt, QTimer
 
 from typingBox import TypingBox
@@ -17,7 +17,7 @@ class Timer:
         # Create the label to display the time
         self.timer_label = QLabel(f"00:00 / {total_minutes:02}:{total_seconds:02}", parent)
         self.timer_label.setAlignment(Qt.AlignHCenter)
-        self.timer_label.setStyleSheet("font-size: 24px;")
+        self.timer_label.setFont(QFont("Times", 24))
         self.timer_label.setGeometry(position[0], position[1], dimensions[0], dimensions[1])
 
         # Create a QTimer that updates the label every second
@@ -29,6 +29,9 @@ class Timer:
         self.restart_on_timeout = restart_on_timeout
 
         self.paused = False
+
+    def setFont(self, font : QFont):
+        self.timer_label.setFont(font)
 
     def pause(self):
         self.paused = True
@@ -132,6 +135,9 @@ class MainWindow(QMainWindow):
     def set_text_size(self, value):
         print("set text size to", value)
         self.text_size = value
+        font = QFont("Times", value)
+        self.timer.setFont(font)
+        self.text_edit.setFont(font)
 
     def restart(self):
         self.timer.restart()
