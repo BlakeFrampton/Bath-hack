@@ -17,6 +17,7 @@ class TypingBox(QTextEdit):
         self.streak = 0
         self.mistakes = 0
         self.correct = 0
+        self.typed = ""
         # textToType = self.getText()
         # self.setTextToType(textToType)
         self.setFont(QFont("Times", 50, QFont.Bold))
@@ -65,6 +66,7 @@ TestTestTestTestTestTestTestTestTestTest
             if e.text() == self._textToType[pos]:
                 format.setForeground(QBrush(QColor("green")))
                 cursor.deleteChar()
+                self.typed += e.text()
                 cursor.setCharFormat(format)
                 cursor.insertText(e.text())
                 cursor.setPosition(pos + 1)
@@ -73,7 +75,7 @@ TestTestTestTestTestTestTestTestTestTest
                 self.streak += 1
             elif ord(e.text()) == 8:  # Backspace
                 if pos > 0:
-                    self.backspace(cursor, pos, format, e)
+                    self.backspace(cursor, pos, format)
             elif ord(e.text()) == 127:  # Ctrl-backspace
                 startingSpace = False
                 if self._textToType[pos - 1] == " ":  # If pressed while on a space
@@ -82,13 +84,14 @@ TestTestTestTestTestTestTestTestTestTest
                 while startingSpace or (pos > 0 and self._textToType[pos - 1] != " "):
                     # Backspace until start of text or word
                     startingSpace = False
-                    self.backspace(cursor, pos, format, e)
+                    self.backspace(cursor, pos, format)
                     pos = cursor.position()
             else:
                 self.mistakes += 1
                 self.streak = 0
                 format.setForeground(QBrush(QColor("red")))
                 cursor.deleteChar()
+                self.typed += e.text()
                 cursor.setCharFormat(format)
                 cursor.insertText(self._textToType[pos])
                 cursor.setPosition(pos + 1)
@@ -99,7 +102,7 @@ TestTestTestTestTestTestTestTestTestTest
         if pos == len(self._textToType):
             cursor.setPosition(0)  # Loop Back
             self.setTextCursor(cursor)
-            finishedTest(self.toPlainText(), self._textToType, self.correct, self.mistakes)
+            finishedTest(self.typed, self._textToType, self.correct, self.mistakes)
             self.streak = 0
             self.correct = 0
             self.mistakes = 0
@@ -115,6 +118,7 @@ TestTestTestTestTestTestTestTestTestTest
         print(indx)
         cursor.setPosition(indx)
         cursor.deleteChar()
+        self.typed = self.typed[:-1]
         cursor.setCharFormat(format)
         cursor.insertText(self._textToType[indx])
         cursor.setPosition(indx)
