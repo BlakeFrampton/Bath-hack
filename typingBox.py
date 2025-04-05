@@ -97,7 +97,10 @@ class TypingBox(QTextEdit):
                 cursor.deleteChar()
                 self.typed += e.text()
                 cursor.setCharFormat(format)
-                cursor.insertText(self._textToType[pos])
+                if self._textToType[pos] == " ":
+                    cursor.insertText("_")
+                else:
+                    cursor.insertText(self._textToType[pos])
                 cursor.setPosition(pos + 1)
                 pos += 1
         except TypeError:
