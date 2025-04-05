@@ -170,13 +170,11 @@ class MainWindow(QMainWindow):
         settings_menu.addAction(word_count_action)
 
     def add_text_theme_menu(self, menu_bar):
-        text_theme_menu = menu_bar.addMenu(QIcon("assets/settings_icon.png"),
+        text_theme_menu = menu_bar.addMenu(QIcon("assets/generation_icon.png"),
                                            "Settings")
 
         def make_action(label):
-            # action = QAction(QIcon(f"assets/{label}_icon.png"), label.capitalize(), self)
-            action = QAction(QIcon("assets/settings_icon.png"),
-                             label.capitalize(), self)
+            action = QAction(QIcon(f"assets/{label}_icon.png"), label.capitalize(), self)
             action.triggered.connect(lambda: self.set_theme_from_input(label))
             return action
 

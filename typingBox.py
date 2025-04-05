@@ -4,7 +4,6 @@ from PySide6.QtWidgets import QApplication, QTextEdit
 from Timer import Timer
 import textGenerator
 import sys
-import os
 from dotenv import load_dotenv
 
 class TypingBox(QTextEdit):
