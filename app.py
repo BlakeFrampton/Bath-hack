@@ -1,11 +1,72 @@
 import sys
 from PySide6.QtGui import QFont, QIcon, QAction, QPainter, QColor
-from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QTextEdit, QFileDialog, QDialog, QSlider, QVBoxLayout, QLabel, QMessageBox
+from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QTextEdit, QFileDialog, QDialog, QSlider, QVBoxLayout, QLabel, QMessageBox, QInputDialog, QLineEdit
 from PySide6.QtCore import QFile, QIODevice, QTextStream, Qt, QTimer
 
 from typingBox import TypingBox
 
 default_button_bg = "4caf50"  # hex value
+
+# by default, the text challenge will close after 5 minutes
+class Timer:
+    def __init__(self, runtime_seconds=300, parent=None, timeout=None, restart_on_timeout=False, position=(0, 0), dimensions=(200, 50)):
+        self.timeout_function = timeout
+        self.runtime_seconds = runtime_seconds
+        total_minutes = self.runtime_seconds // 60
+        total_seconds = self.runtime_seconds % 60
+
+        # Create the label to display the time
+        self.timer_label = QLabel(f"00:00 / {total_minutes:02}:{total_seconds:02}", parent)
+        self.timer_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        self.timer_label.setStyleSheet("font-size: 24px;")
+        self.timer_label.setGeometry(position[0], position[1], dimensions[0], dimensions[1])
+
+        # Create a QTimer that updates the label every second
+        self.timer = QTimer(parent)
+        self.timer.timeout.connect(self.update_timer)  # connect the timeout signal to our update function
+        self.timer.start(1000)  # 1000 milliseconds = 1 second
+
+        self.elapsed_time = 0
+        self.restart_on_timeout = restart_on_timeout
+
+        self.paused = False
+
+    def pause(self):
+        self.paused = True
+
+    def unpause(self):
+        self.paused = False
+
+    def restart(self):
+        total_minutes = self.runtime_seconds // 60
+        total_seconds = self.runtime_seconds % 60
+
+        self.timer.start(1000)  # 1000 milliseconds = 1 second
+
+        self.elapsed_time = 0
+        self.timer_label.setText(f"00:00 / {total_minutes:02}:{total_seconds:02}")
+
+    def update_timer(self):
+        total_minutes = self.runtime_seconds // 60
+        total_seconds = self.runtime_seconds % 60
+
+        if self.elapsed_time < self.runtime_seconds and not self.paused:
+            self.elapsed_time += 1
+
+            minutes = self.elapsed_time // 60
+            seconds = self.elapsed_time % 60
+
+            self.timer_label.setText(f"{minutes:02}:{seconds:02} / {total_minutes:02}:{total_seconds:02}")  # Format as MM:SS
+            # check for the timer ending
+            if self.elapsed_time >= self.runtime_seconds:
+                self.timer_label.setText(f"{total_minutes:02}:{total_seconds:02} / {total_minutes:02}:{total_seconds:02}")  # Format as MM:SS
+                self.timeout()
+
+    def timeout(self):
+        self.timeout_function()
+
+        if self.restart_on_timeout:
+            self.restart()
 
 
 class SliderWindow(QDialog):
@@ -67,6 +128,11 @@ class MainWindow(QMainWindow):
         self.volume = 50
         self.text_size = 15
 
+        # text generation settings
+        self.word_count = 50
+        self.generation_type = "theme"
+        self.generation_type_content = "typing"
+
         # menu bar
         self.create_menu()
 
@@ -107,6 +173,10 @@ class MainWindow(QMainWindow):
         font = QFont("Times", value)
 
         self.current_widget_page.set_font(font)
+    
+    def set_word_count(self, value):
+        print("set word count to ", value)
+        self.word_count = value
 
     def restart(self):
         self.current_widget_page.reset()
@@ -130,9 +200,13 @@ class MainWindow(QMainWindow):
     def show_text_size(self):
         text_window = SliderWindow(self, (10, 18), self.text_size, "Text Size", self.set_text_size)
         text_window.show()
+    
+    def show_word_count(self):
+        text_window = SliderWindow(self, (40, 200), self.word_count, "Word Count", self.set_word_count)
+        text_window.show()
 
-    def toggle_mistake_highlight(self):
-        self.text_edit.toggle_mistake_override()
+    def home(self):
+        print("Go to home screen")
 
     def add_settings_menu(self, menu_bar):
         settings_menu = menu_bar.addMenu(QIcon("assets/settings_icon.png"), "Settings")
@@ -142,12 +216,45 @@ class MainWindow(QMainWindow):
         settings_menu.addAction(volume_action)
 
         text_action = QAction(QIcon("assets/font_icon.png"), "Font Size", self)
-        text_action.triggered.connect(self.show_text_size)
+        text_action.triggered.connect(self.show_text_size)  
         settings_menu.addAction(text_action)
 
-        mistake_action = QAction(QIcon("assets/error_icon.png"), "Toggle mistake highlight", self)
-        mistake_action.triggered.connect(self.toggle_mistake_highlight)
-        settings_menu.addAction(mistake_action)
+        word_count_action = QAction(QIcon("assets/font_icon.png"), "Word Count", self)
+        word_count_action.triggered.connect(self.show_word_count)
+        settings_menu.addAction(word_count_action)
+
+    def add_text_theme_menu(self, menu_bar):
+        text_theme_menu = menu_bar.addMenu(QIcon("assets/settings_icon.png"), "Settings")
+
+        def make_action(label):
+            # action = QAction(QIcon(f"assets/{label}_icon.png"), label.capitalize(), self)
+            action = QAction(QIcon(f"assets/settings_icon.png"), label.capitalize(), self)
+            action.triggered.connect(lambda: self.set_theme_from_input(label))
+            return action
+
+        for label in ["theme", "code", "notes"]:
+            text_theme_menu.addAction(make_action(label))
+
+    def set_theme_from_input(self, style_type):
+        self.style = style_type
+        dialog = QInputDialog(self)
+        dialog.setWindowTitle(f"Enter {style_type.capitalize()}")
+        if style_type == "code":
+            dialog.setLabelText(f"Enter your coding language:")
+        else:
+            dialog.setLabelText(f"Enter your {style_type}:")
+        dialog.setInputMode(QInputDialog.TextInput)
+        dialog.setTextEchoMode(QLineEdit.Normal)
+
+        if dialog.exec():  # Show dialogue
+            user_input = dialog.textValue()
+            if user_input:
+                print(f"{style_type.capitalize()} set to: {user_input}")
+                self.generation_type = style_type
+                self.generation_type_content = user_input
+            else:
+                print(f"No {style_type} entered.")
+
 
     def create_menu(self):
         menu_bar = self.menuBar()
@@ -158,6 +265,7 @@ class MainWindow(QMainWindow):
 
         self.add_file_menu(menu_bar)
         self.add_settings_menu(menu_bar)
+        self.add_text_theme_menu(menu_bar)
 
 
 if __name__ == "__main__":
