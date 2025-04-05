@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtGui import QFont, QIcon, QAction
 from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QDialog, QSlider, QVBoxLayout, QLabel, QInputDialog, QLineEdit
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 
 from typingBox import TypingBox
 from Timer import Timer
@@ -84,6 +84,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(text_edit)
         self.Timer = Timer(parent=self, runtime_seconds=30, position=(0, 200))
         self.current_widget_page = text_edit
+        QTimer.singleShot(0, text_edit.setFocus)
+
 
     def enter_home(self):
         # home screen

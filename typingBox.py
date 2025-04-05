@@ -13,23 +13,23 @@ class TypingBox(QTextEdit):
 
         backgroundColour = "#282E78"
         self.setStyleSheet(f'background-color: {backgroundColour}')
-        self.setFocus()
 
         load_dotenv()
         self.streak = 0
         self.mistakes = 0
         self.correct = 0
         self.typed = ""
-        textToType = self.getText(word_count,
-                                  generation_type, generation_type_content)
-        self.setTextToType(textToType)
+        #textToType = self.getText(word_count,
+                                  #generation_type, generation_type_content)
+        #self.setTextToType(textToType)
         self.setFont(QFont("Times", 50, QFont.Bold))
-        # self.setTextToType("""In ancient times, the invention of the catapult revolutionized warfare. This powerful siege engine could launch projectiles with incredible force, causing devastation to enemy fortifications. The sound of the catapult releasing was a loud noise that struck fear into the hearts of those under attack. Additionally, when the projectiles hit their target, clouds of smoke and dust would fill the air. The catapult's ability to hurl heavy objects over long distances made it a formidable weapon in countless battles throughout history.""")
+        self.setTextToType("""In ancient times, the invention of the catapult revolutionized warfare. This powerful siege engine could launch projectiles with incredible force, causing devastation to enemy fortifications. The sound of the catapult releasing was a loud noise that struck fear into the hearts of those under attack. Additionally, when the projectiles hit their target, clouds of smoke and dust would fill the air. The catapult's ability to hurl heavy objects over long distances made it a formidable weapon in countless battles throughout history.""")
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.mistakesOverride = False
 
+
         # timer
-        self.timeout_func = timeout_func
+        # self.timeout_func = timeout_func
 
     def end_typing(self):
         # self.typed, self._textToType, self.correct, self.mistakes
