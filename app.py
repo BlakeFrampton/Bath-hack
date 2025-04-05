@@ -101,9 +101,12 @@ class SliderWindow(QDialog):
 
 class MainWindow(QMainWindow):
     def __init__(self):
+        backgroundColour = "#080E4B"
         super().__init__()
         self.setWindowTitle("Error 404")
         self.setGeometry(100, 100, 800, 600)
+        self.setStyleSheet(f'QMainWindow {{background: {backgroundColour}}}')
+
 
         # text thing
         self.text_edit = TypingBox()

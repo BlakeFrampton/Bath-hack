@@ -12,6 +12,9 @@ class TypingBox(QTextEdit):
     def __init__(self, **_):
         super().__init__()
 
+        backgroundColour = "#282E78"
+        self.setStyleSheet(f'background-color: {backgroundColour}')
+
         load_dotenv()
         self.setFont(QFont("Times", 18, QFont.Bold))
         self.streak = 0
@@ -20,20 +23,7 @@ class TypingBox(QTextEdit):
         # textToType = self.getText()
         # self.setTextToType(textToType)
         self.setFont(QFont("Times", 50, QFont.Bold))
-        self.setTextToType("""TestTestTestTestTestTestTestTestTestTest
-TestTestTestTestTestTestTestTestTestTest
-TestTestTestTestTestTestTestTestTestTest
-TestTestTestTestTestTestTestTestTestTest
-TestTestTestTestTestTestTestTestTestTest
-TestTestTestTestTestTestTestTestTestTest
-TestTestTestTestTestTestTestTestTestTest
-TestTestTestTestTestTestTestTestTestTest
-TestTestTestTestTestTestTestTestTestTest
-TestTestTestTestTestTestTestTestTestTest
-TestTestTestTestTestTestTestTestTestTest
-TestTestTestTestTestTestTestTestTestTest
-TestTestTestTestTestTestTestTestTestTest
-        """)
+        self.setTextToType("""In ancient times, the invention of the catapult revolutionized warfare. This powerful siege engine could launch projectiles with incredible force, causing devastation to enemy fortifications. The sound of the catapult releasing was a loud noise that struck fear into the hearts of those under attack. Additionally, when the projectiles hit their target, clouds of smoke and dust would fill the air. The catapult's ability to hurl heavy objects over long distances made it a formidable weapon in countless battles throughout history.""")
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setOverwriteMode(True)
         self.mistakesOverride = False
@@ -45,10 +35,10 @@ TestTestTestTestTestTestTestTestTestTest
 
         # remove the current text
         format = QTextCharFormat()
-        format.setForeground(QBrush(QColor("black")))
+        format.setForeground(QBrush(QColor("white")))
         cursor = self.textCursor()
         while cursor.position() > 0:
-            self.backspace(cursor, cursor.position(), format, "")
+            self.backspace(cursor, cursor.position(), format)
 
 
     def keyPressEvent(self, e: QKeyEvent) -> None:
@@ -60,7 +50,6 @@ TestTestTestTestTestTestTestTestTestTest
         self.scroll()
         
 
-        print("streak: ", self.streak)
         try:
             if e.text() == self._textToType[pos]:
                 format.setForeground(QBrush(QColor("green")))
@@ -73,7 +62,7 @@ TestTestTestTestTestTestTestTestTestTest
                 self.streak += 1
             elif ord(e.text()) == 8:  # Backspace
                 if pos > 0:
-                    self.backspace(cursor, pos, format, e)
+                    self.backspace(cursor, pos, format)
             elif ord(e.text()) == 127:  # Ctrl-backspace
                 startingSpace = False
                 if self._textToType[pos - 1] == " ":  # If pressed while on a space
@@ -82,8 +71,10 @@ TestTestTestTestTestTestTestTestTestTest
                 while startingSpace or (pos > 0 and self._textToType[pos - 1] != " "):
                     # Backspace until start of text or word
                     startingSpace = False
-                    self.backspace(cursor, pos, format, e)
+                    self.backspace(cursor, pos, format)
                     pos = cursor.position()
+            elif e.key() == Qt.Key_Backtab: #Shift + tab
+                self.reset()
             else:
                 self.mistakes += 1
                 self.streak = 0
@@ -112,7 +103,6 @@ TestTestTestTestTestTestTestTestTestTest
 
     def backspace(self, cursor, pos, format):
         indx = (pos - 1) % len(self._textToType)
-        print(indx)
         cursor.setPosition(indx)
         cursor.deleteChar()
         cursor.setCharFormat(format)
