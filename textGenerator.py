@@ -4,13 +4,6 @@ import os
 # Import the openai package
 from openai import OpenAI
 
-# From the IPython.display package, import display and Markdown
-from IPython.display import display, Markdown
-
-# Import yfinance as yf
-import yfinance as yf
-
-
 print("start")
 
 

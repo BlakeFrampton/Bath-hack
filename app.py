@@ -3,29 +3,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QTextEdit, QFileDialog,
 from PySide6.QtGui import QIcon, QAction, QPainter, QColor
 from PySide6.QtCore import QFile, QIODevice, QTextStream, Qt, QTimer
 
-
-class PlaceholderTextEdit(QTextEdit):
-    def __init__(self, placeholder_text="initial text", parent=None):
-        super().__init__(parent)
-        self._placeholder_text = placeholder_text
-        self.textChanged.connect(self.update)
-
-    def setPlaceholderText(self, text):
-        self._placeholder_text = text
-        self.update()
-
-    def placeholderText(self):
-        return self._placeholder_text
-
-    def paintEvent(self, event):
-        super().paintEvent(event)
-        if self.toPlainText() == "":
-            painter = QPainter(self.viewport())
-            painter.setPen(QColor(150, 150, 150))  # Light gray color
-            # painter.setFont(self.font())
-            margin = self.document().documentMargin()
-            painter.drawText(self.viewport().rect().adjusted(margin + 2, margin, 0, 0),
-                             Qt.AlignTop | Qt.AlignLeft, self._placeholder_text)
+from typingBox import TypingBox
 
 
 # by default, the text challenge will close after 5 minutes
@@ -128,7 +106,7 @@ class MainWindow(QMainWindow):
         self.setGeometry(100, 100, 800, 600)
 
         # text thing
-        self.text_edit = PlaceholderTextEdit()
+        self.text_edit = TypingBox()
         self.setCentralWidget(self.text_edit)
 
         # settings
@@ -154,6 +132,7 @@ class MainWindow(QMainWindow):
 
     def restart(self):
         self.timer.restart()
+        self.text_edit.reset()
         print("restart?")
 
     def add_file_menu(self, menu_bar):

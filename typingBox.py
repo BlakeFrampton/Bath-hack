@@ -15,7 +15,7 @@ class TypingBox(QTextEdit):
         load_dotenv()
         self.setFont(QFont("Times", 18, QFont.Bold))
         self.streak = 0
-        self.mistake = 0
+        self.mistakes = 0
         self.correct = 0
         # textToType = self.getText()
         # self.setTextToType(textToType)
@@ -38,43 +38,59 @@ TestTestTestTestTestTestTestTestTestTest
         self.setOverwriteMode(True)
         self.mistakesOverride = False
 
+    def reset(self):
+        self.streak = 0
+        self.mistakes = 0
+        self.correct = 0
+
+        # remove the current text
+        format = QTextCharFormat()
+        format.setForeground(QBrush(QColor("black")))
+        cursor = self.textCursor()
+        while cursor.position() > 0:
+            self.backspace(cursor, cursor.position(), format, "")
+
+
     def keyPressEvent(self, e: QKeyEvent) -> None:
         cursor = self.textCursor()
         pos = cursor.position()
         format = QTextCharFormat()
 
         print("streak: ", self.streak)
-        if e.text() == self._textToType[pos]:
-            format.setForeground(QBrush(QColor("green")))
-            cursor.deleteChar()
-            cursor.setCharFormat(format)
-            cursor.insertText(e.text())
-            cursor.setPosition(pos + 1)
-            pos += 1
-            self.correct += 1
-            self.streak += 1
-        elif ord(e.text()) == 8:  # Backspace
-            if pos > 0:
-                self.backspace(cursor, pos, format, e)
-        elif ord(e.text()) == 127:  # Ctrl-backspace
-            startingSpace = False
-            if self._textToType[pos - 1] == " ":  # If pressed while on a space
-                # delete from space to start of previous word
-                startingSpace = True
-            while startingSpace or (pos > 0 and self._textToType[pos - 1] != " "):
-                # Backspace until start of text or word
+        try:
+            if e.text() == self._textToType[pos]:
+                format.setForeground(QBrush(QColor("green")))
+                cursor.deleteChar()
+                cursor.setCharFormat(format)
+                cursor.insertText(e.text())
+                cursor.setPosition(pos + 1)
+                pos += 1
+                self.correct += 1
+                self.streak += 1
+            elif ord(e.text()) == 8:  # Backspace
+                if pos > 0:
+                    self.backspace(cursor, pos, format, e)
+            elif ord(e.text()) == 127:  # Ctrl-backspace
                 startingSpace = False
-                self.backspace(cursor, pos, format, e)
-                pos = cursor.position()
-        else:
-            self.mistake += 1
-            self.streak = 0
-            format.setForeground(QBrush(QColor("red")))
-            cursor.deleteChar()
-            cursor.setCharFormat(format)
-            cursor.insertText(self._textToType[pos])
-            cursor.setPosition(pos + 1)
-            pos += 1
+                if self._textToType[pos - 1] == " ":  # If pressed while on a space
+                    # delete from space to start of previous word
+                    startingSpace = True
+                while startingSpace or (pos > 0 and self._textToType[pos - 1] != " "):
+                    # Backspace until start of text or word
+                    startingSpace = False
+                    self.backspace(cursor, pos, format, e)
+                    pos = cursor.position()
+            else:
+                self.mistakes += 1
+                self.streak = 0
+                format.setForeground(QBrush(QColor("red")))
+                cursor.deleteChar()
+                cursor.setCharFormat(format)
+                cursor.insertText(self._textToType[pos])
+                cursor.setPosition(pos + 1)
+                pos += 1
+        except TypeError:
+            pass
 
         if pos == len(self._textToType):
             cursor.setPosition(0)  # Loop Back
