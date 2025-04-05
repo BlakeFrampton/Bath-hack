@@ -84,12 +84,15 @@ class MainWindow(QMainWindow):
         self.create_menu()
 
     def enter_typing(self):
+        text = "some text about catapults"
         text_edit = TypingBox(
+                              self.timeout,
+                              self.timer,
                               self.word_count,
                               self.generation_type,
                               self.generation_type_content,
-                              self.timeout,
-                              self.timer)
+                              use_text=text
+                              )
         self.setCentralWidget(text_edit)
 
         self.timer.show()
@@ -136,6 +139,12 @@ class MainWindow(QMainWindow):
         title_text.setStyleSheet("color: white")
         title_text.setAlignment(Qt.AlignCenter)
         home_layout.addWidget(title_text)
+
+        def reset_title():
+            return
+
+        # title_text = TypingBox(reset_title, )
+
         # typing game
         typing_button = QPushButton("Typing Frenzy", self)
         typing_button.setFont(QFont("Times", 100))
