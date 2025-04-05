@@ -90,6 +90,7 @@ class MainWindow(QMainWindow):
                               self.generation_type_content,
                               self.timeout,
                               self.timer)
+        text_edit.setStyleSheet("margin: 100px 50px 100px 50px")
         self.setCentralWidget(text_edit)
 
         self.timer.show()
