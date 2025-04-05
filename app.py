@@ -1,3 +1,4 @@
+from os import WCOREDUMP
 import sys
 from PySide6.QtGui import QBrush, QFont, QIcon, QAction, QColor
 from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QDialog, QSlider, QVBoxLayout, QLabel, QInputDialog, QLineEdit
@@ -119,30 +120,50 @@ class MainWindow(QMainWindow):
         print(self.timer.elapsed_time, correct, final_accuracy)
 
         wpm = (correct / 6) * (final_accuracy / 100) / minutes_taken
-        final_wpm = round(wpm)
+        score = round(wpm)
 
-        return final_accuracy, final_wpm
+        return round(final_accuracy, 2), round(wpm), round(score, 1)
 
     def timeout(self):
         # calculate statistics
-        accuracy, wpm = self.get_statistics()
+        accuracy, wpm, score = self.get_statistics()
 
         print("Final accuracy: " + str(accuracy))
         print("Final wpm: " + str(wpm))
+        print("Final score: " + str(score))
 
         # go back to the home screen
-        self.enter_home()
+        self.enter_home(accuracy, wpm, score)
         print("timeout")
 
-    def enter_home(self):
+    def enter_home(self, accuracy=None, wpm=None, score=None):
         # home screen
         home_layout = QVBoxLayout()
         # title
         title_text = QLabel("Typesmith", self)
         title_text.setFont(QFont("Times", 100))
+        title_text = QLabel("Typesmith", self)
+        title_text.setFont(QFont("Times", 100))
+        home_layout.addWidget(title_text)
+        if accuracy is not None and wpm is not None and score is not None:
+            accuracy_text = QLabel(str(accuracy)+"%", self)
+            accuracy_text.setFont(QFont("Times", 50))
+            accuracy_text.setAlignment(Qt.AlignCenter)
+
+            wpm_text = QLabel(str(wpm)+" wpm", self)
+            wpm_text.setFont(QFont("Times", 50))
+            wpm_text.setAlignment(Qt.AlignCenter)
+
+            score_text = QLabel("Score: "+str(score), self)
+            score_text.setFont(QFont("Times", 50))
+            score_text.setAlignment(Qt.AlignCenter)
+
+            home_layout.addWidget(accuracy_text)
+            home_layout.addWidget(wpm_text)
+            home_layout.addWidget(score_text)
+
         title_text.setStyleSheet("color: white")
         title_text.setAlignment(Qt.AlignCenter)
-        home_layout.addWidget(title_text)
 
         def reset_title():
             return
