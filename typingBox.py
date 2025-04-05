@@ -40,8 +40,12 @@ TestTestTestTestTestTestTestTestTestTest
 
     def keyPressEvent(self, e: QKeyEvent) -> None:
         cursor = self.textCursor()
-        pos = cursor.position()
         format = QTextCharFormat()
+
+        pos = cursor.position()
+
+        self.scroll()
+        
 
         print("streak: ", self.streak)
         if e.text() == self._textToType[pos]:
@@ -55,7 +59,7 @@ TestTestTestTestTestTestTestTestTestTest
             self.streak += 1
         elif ord(e.text()) == 8:  # Backspace
             if pos > 0:
-                self.backspace(cursor, pos, format, e)
+                self.backspace(cursor, pos, format)
         elif ord(e.text()) == 127:  # Ctrl-backspace
             startingSpace = False
             if self._textToType[pos - 1] == " ":  # If pressed while on a space
@@ -84,16 +88,19 @@ TestTestTestTestTestTestTestTestTestTest
             self.correct = 0
             self.mistakes = 0
 
-    def backspace(self, cursor, pos, format, e):
+    def scroll(self):
+        cursorPos = self.mapToGlobal(self.cursorRect().topLeft()).y()
+        if (cursorPos > 0.6 * self.height()):
+            scrollBar = self.verticalScrollBar()
+            scrollBar.setValue(scrollBar.value() + 20)
+
+    def backspace(self, cursor, pos, format):
         indx = (pos - 1) % len(self._textToType)
         print(indx)
         cursor.setPosition(indx)
         cursor.deleteChar()
         cursor.setCharFormat(format)
-        if self.mistakesOverride:
-            cursor.insertText(e.text())
-        else:
-            cursor.insertText(self._textToType[indx])
+        cursor.insertText(self._textToType[indx])
         cursor.setPosition(indx)
         self.setTextCursor(cursor)
 
