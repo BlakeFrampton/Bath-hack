@@ -153,7 +153,16 @@ class TypingBox(QTextEdit):
 
 
 def finishedTest(typed: str, target: str, correct: int, mistakes: int):
-    pass
+    accuracy = 0
+    accuracy = (1 - mistakes / len(target)) * 100
+    accuracy = max(accuracy, 0)  # Ensure accuracy doesn't go below 0%
+    final_accuracy = round(accuracy, 1)
+    
+    wpm = (len(target) / 6) * (accuracy / 100)
+    final_wpm = round(wpm)
+
+    print("Final accurcay: " + str(final_accuracy))
+    print("Final wpm: " + str(final_wpm))
 
 
 if __name__ == "__main__":
