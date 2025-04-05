@@ -1,4 +1,4 @@
-from PySide6.QtGui import QKeyEvent, QTextCursor
+from PySide6.QtGui import QBrush, QColor, QFont, QKeyEvent, QTextCharFormat
 from PySide6.QtWidgets import QApplication, QTextEdit
 import sys
 
@@ -11,14 +11,27 @@ class TypingBox(QTextEdit):
         self.setOverwriteMode(True)
 
     def keyPressEvent(self, e: QKeyEvent) -> None:
-        textToType = self.textToType()
-        pos = self.textCursor().position()
-        if pos == len(textToType) - 1:
+        cursor = self.textCursor()
+        pos = cursor.position()
+        format = QTextCharFormat()
+        format.setFontWeight(QFont().bold())
+        if pos == len(self._textToType) - 1:
             self.textCursor().setPosition(0)  # Loop Back
 
-        if e.text() == textToType[pos]:
-            self.textCursor().setPosition(pos + 1)
-            return super().keyPressEvent(e)
+        if e.text() == self._textToType[pos]:
+            format.setForeground(QBrush(QColor("green")))
+            cursor.deleteChar()
+            cursor.setCharFormat(format)
+            cursor.insertText(e.text())
+            cursor.setPosition(pos + 1)
+        elif e.text() == "":
+            pass
+        else:
+            format.setForeground(QBrush(QColor("red")))
+            cursor.deleteChar()
+            cursor.setCharFormat(format)
+            cursor.insertText(e.text())
+            cursor.setPosition(pos + 1)
 
     def insertFromMimeData(self, _) -> None:
         pass  # Disable Pasting
@@ -27,6 +40,7 @@ class TypingBox(QTextEdit):
         return self.toPlainText()
 
     def setTextToType(self, message: str) -> None:
+        self._textToType = message
         return self.setText(message)
 
 
