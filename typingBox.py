@@ -11,6 +11,7 @@ class TypingBox(QTextEdit):
         self.setFont(QFont("Times", 50, QFont.Bold))
         self.setTextToType("Test")
         self.setOverwriteMode(True)
+        self.mistakesOverride = False
 
     def mousePressEvent(self, _: QMouseEvent, /) -> None:
         pass
@@ -36,7 +37,10 @@ class TypingBox(QTextEdit):
             cursor.setPosition(indx)
             cursor.deleteChar()
             cursor.setCharFormat(format)
-            cursor.insertText(self._textToType[indx])
+            if self.mistakesOverride:
+                cursor.insertText(e.text())
+            else:
+                cursor.insertText(self._textToType[indx])
             cursor.setPosition(indx)
             self.setTextCursor(cursor)
         else:
@@ -45,14 +49,14 @@ class TypingBox(QTextEdit):
             format.setForeground(QBrush(QColor("red")))
             cursor.deleteChar()
             cursor.setCharFormat(format)
-            cursor.insertText(e.text())
+            cursor.insertText(self._textToType[pos])
             cursor.setPosition(pos + 1)
             pos += 1
 
         if pos == len(self._textToType):
             cursor.setPosition(0)  # Loop Back
             self.setTextCursor(cursor)
-            print("new pos: ", cursor.position())
+            finishedTest(self.toPlainText(), self._textToType)
 
     def insertFromMimeData(self, _) -> None:
         pass  # Disable Pasting
