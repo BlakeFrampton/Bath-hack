@@ -180,7 +180,7 @@ class MainWindow(QMainWindow):
         restart_action.triggered.connect(self.restart)
         file_menu.addAction(restart_action)
 
-        exit_action = QAction("Exit", self)
+        exit_action = QAction(QIcon("assets/exit_icon.png"), "Exit", self)
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
 
