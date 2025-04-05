@@ -1,5 +1,5 @@
 from PySide6.QtGui import (QBrush, QColor, QFont, QKeyEvent,
-                           QMouseEvent, QTextCharFormat)
+                           QMouseEvent, QTextCharFormat, Qt)
 from PySide6.QtWidgets import QApplication, QTextEdit
 from textGenerator import getTextToType
 import sys
@@ -17,12 +17,26 @@ class TypingBox(QTextEdit):
         self.streak = 0
         self.mistake = 0
         self.correct = 0
-        self.setTextToType("Multiple test words")
         # textToType = self.getText()
         # self.setTextToType(textToType)
+        self.setFont(QFont("Times", 50, QFont.Bold))
+        self.setTextToType("""TestTestTestTestTestTestTestTestTestTest
+TestTestTestTestTestTestTestTestTestTest
+TestTestTestTestTestTestTestTestTestTest
+TestTestTestTestTestTestTestTestTestTest
+TestTestTestTestTestTestTestTestTestTest
+TestTestTestTestTestTestTestTestTestTest
+TestTestTestTestTestTestTestTestTestTest
+TestTestTestTestTestTestTestTestTestTest
+TestTestTestTestTestTestTestTestTestTest
+TestTestTestTestTestTestTestTestTestTest
+TestTestTestTestTestTestTestTestTestTest
+TestTestTestTestTestTestTestTestTestTest
+TestTestTestTestTestTestTestTestTestTest
+        """)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setOverwriteMode(True)
         self.mistakesOverride = False
-
 
     def keyPressEvent(self, e: QKeyEvent) -> None:
         cursor = self.textCursor()
@@ -42,16 +56,17 @@ class TypingBox(QTextEdit):
         elif ord(e.text()) == 8:  # Backspace
             if pos > 0:
                 self.backspace(cursor, pos, format, e)
-        elif ord(e.text()) == 127: # Ctrl-backspace
+        elif ord(e.text()) == 127:  # Ctrl-backspace
             startingSpace = False
-            if self._textToType[pos - 1] == " ": # If pressed while on a space, delete from space to start of previous word
+            if self._textToType[pos - 1] == " ":  # If pressed while on a space
+                # delete from space to start of previous word
                 startingSpace = True
-            while startingSpace or (pos > 0 and self._textToType[pos - 1] != " "): # Backspace until start of text or word
+            while startingSpace or (pos > 0 and self._textToType[pos - 1] != " "):
+                # Backspace until start of text or word
                 startingSpace = False
                 self.backspace(cursor, pos, format, e)
                 pos = cursor.position()
         else:
-            print((e.text().isprintable()))
             self.mistake += 1
             self.streak = 0
             format.setForeground(QBrush(QColor("red")))
@@ -82,7 +97,6 @@ class TypingBox(QTextEdit):
         cursor.setPosition(indx)
         self.setTextCursor(cursor)
 
-    
     def insertFromMimeData(self, _) -> None:
         pass  # Disable Pasting
 
@@ -97,7 +111,12 @@ class TypingBox(QTextEdit):
         targetLength = 50
         theme = "coffee"
         difficultWords = ["cappuccino", "spring", "crisp", "establishment"]
-        return getTextToType(theme, difficultWords, targetLength, True, os.environ.get("OPENAI_API_KEY"))
+        return getTextToType(theme, difficultWords, targetLength,
+                             True, os.environ.get("OPENAI_API_KEY"))
+
+
+def finishedTest(typed: str, target: str, correct: int, mistakes: int):
+    pass
 
 
 if __name__ == "__main__":
