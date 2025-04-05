@@ -1,73 +1,11 @@
 from PySide6.QtGui import (QBrush, QColor, QFont, QKeyEvent,
                            QMouseEvent, QTextCharFormat, Qt)
-from PySide6.QtWidgets import QApplication, QTextEdit, QLabel
-from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import QApplication, QTextEdit
+from Timer import Timer
 import textGenerator
 import sys
 import os
 from dotenv import load_dotenv
-
-# by default, the text challenge will close after 5 minutes
-class Timer:
-    def __init__(self, runtime_seconds=300, parent=None, timeout=None, restart_on_timeout=False, position=(0, 0), dimensions=(200, 50)):
-        self.timeout_function = timeout
-        self.runtime_seconds = runtime_seconds
-        total_minutes = self.runtime_seconds // 60
-        total_seconds = self.runtime_seconds % 60
-
-        # Create the label to display the time
-        self.timer_label = QLabel(f"00:00 / {total_minutes:02}:{total_seconds:02}", parent)
-        self.timer_label.setAlignment(Qt.AlignHCenter)
-        self.timer_label.setStyleSheet("font-size: 24px;")
-        self.timer_label.setGeometry(position[0], position[1], dimensions[0], dimensions[1])
-
-        # Create a QTimer that updates the label every second
-        self.timer = QTimer(parent)
-        self.timer.timeout.connect(self.update_timer)  # connect the timeout signal to our update function
-        self.timer.start(1000)  # 1000 milliseconds = 1 second
-
-        self.elapsed_time = 0
-        self.restart_on_timeout = restart_on_timeout
-
-        self.paused = False
-
-    def pause(self):
-        self.paused = True
-
-    def unpause(self):
-        self.paused = False
-
-    def restart(self):
-        total_minutes = self.runtime_seconds // 60
-        total_seconds = self.runtime_seconds % 60
-
-        self.timer.start(1000)  # 1000 milliseconds = 1 second
-
-        self.elapsed_time = 0
-        self.timer_label.setText(f"00:00 / {total_minutes:02}:{total_seconds:02}")
-
-    def update_timer(self):
-        total_minutes = self.runtime_seconds // 60
-        total_seconds = self.runtime_seconds % 60
-
-        if self.elapsed_time < self.runtime_seconds and not self.paused:
-            self.elapsed_time += 1
-
-            minutes = self.elapsed_time // 60
-            seconds = self.elapsed_time % 60
-
-            self.timer_label.setText(f"{minutes:02}:{seconds:02} / {total_minutes:02}:{total_seconds:02}")  # Format as MM:SS
-            # check for the timer ending
-            if self.elapsed_time >= self.runtime_seconds:
-                self.timer_label.setText(f"{total_minutes:02}:{total_seconds:02} / {total_minutes:02}:{total_seconds:02}")  # Format as MM:SS
-                self.timeout()
-
-    def timeout(self):
-        self.timeout_function()
-
-        if self.restart_on_timeout:
-            self.restart()
-
 
 class TypingBox(QTextEdit):
 
@@ -78,7 +16,6 @@ class TypingBox(QTextEdit):
         self.setStyleSheet(f'background-color: {backgroundColour}')
 
         load_dotenv()
-        self.setFont(QFont("Times", 18, QFont.Bold))
         self.streak = 0
         self.mistakes = 0
         self.correct = 0
@@ -125,11 +62,10 @@ class TypingBox(QTextEdit):
 
         pos = cursor.position()
 
-        self.scroll()
-        
+        self.smoothScroll()
 
         try:
-            if e.text() == self._textToType[pos]: # If input is correct
+            if e.text() == self._textToType[pos]:  # If input is correct
                 fontColour = "#28785e"
                 format.setForeground(QBrush(QColor(fontColour)))
                 cursor.deleteChar()
@@ -176,7 +112,7 @@ class TypingBox(QTextEdit):
             self.correct = 0
             self.mistakes = 0
 
-    def scroll(self):
+    def smoothScroll(self):
         cursorPos = self.mapToGlobal(self.cursorRect().topLeft()).y()
         if (cursorPos > 0.6 * self.height()):
             scrollBar = self.verticalScrollBar()
