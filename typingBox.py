@@ -13,6 +13,7 @@ class TypingBox(QTextEdit):
 
         backgroundColour = "#282E78"
         self.setStyleSheet(f'background-color: {backgroundColour}')
+        self.setTextColor(QColor("white"))  #Default font color is white
 
         load_dotenv()
         self.streak = 0
@@ -23,7 +24,8 @@ class TypingBox(QTextEdit):
                                   #generation_type, generation_type_content)
         #self.setTextToType(textToType)
         self.setFont(QFont("Times", 50, QFont.Bold))
-        self.setTextToType("""In ancient times, the invention of the catapult revolutionized warfare. This powerful siege engine could launch projectiles with incredible force, causing devastation to enemy fortifications. The sound of the catapult releasing was a loud noise that struck fear into the hearts of those under attack. Additionally, when the projectiles hit their target, clouds of smoke and dust would fill the air. The catapult's ability to hurl heavy objects over long distances made it a formidable weapon in countless battles throughout history.""")
+        # self.setTextToType("""In ancient times, the invention of the catapult revolutionized warfare. This powerful siege engine could launch projectiles with incredible force, causing devastation to enemy fortifications. The sound of the catapult releasing was a loud noise that struck fear into the hearts of those under attack. Additionally, when the projectiles hit their target, clouds of smoke and dust would fill the air. The catapult's ability to hurl heavy objects over long distances made it a formidable weapon in countless battles throughout history.""")
+        self.setTextToType("Shorter text")
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.mistakesOverride = False
 

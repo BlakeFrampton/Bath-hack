@@ -1,5 +1,5 @@
 import sys
-from PySide6.QtGui import QFont, QIcon, QAction
+from PySide6.QtGui import QFont, QIcon, QAction, QColor
 from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QDialog, QSlider, QVBoxLayout, QLabel, QInputDialog, QLineEdit
 from PySide6.QtCore import Qt, QTimer
 
@@ -19,6 +19,8 @@ class SliderWindow(QDialog):
         self.parent_window = parent
 
         layout = QVBoxLayout(self)
+
+        self.setTextColor(QColor("white"))  #Default font color is white
 
         self.text = text
 
@@ -94,7 +96,6 @@ class MainWindow(QMainWindow):
 
         self.current_widget_page = text_edit
         QTimer.singleShot(0, text_edit.setFocus) #Focuses typing test after it has loaded
-
 
     def get_statistics(self):
         mistakes = self.current_widget_page.get_mistakes()
