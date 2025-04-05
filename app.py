@@ -1,74 +1,11 @@
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QTextEdit, QFileDialog, QDialog, QSlider, QVBoxLayout, QLabel, QMessageBox
 from PySide6.QtGui import QFont, QIcon, QAction, QPainter, QColor
+from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QTextEdit, QFileDialog, QDialog, QSlider, QVBoxLayout, QLabel, QMessageBox
 from PySide6.QtCore import QFile, QIODevice, QTextStream, Qt, QTimer
 
 from typingBox import TypingBox
 
-
-# by default, the text challenge will close after 5 minutes
-class Timer:
-    def __init__(self, runtime_seconds=300, parent=None, timeout=None, restart_on_timeout=False, position=(0, 0), dimensions=(200, 50)):
-        self.timeout_function = timeout
-        self.runtime_seconds = runtime_seconds
-        total_minutes = self.runtime_seconds // 60
-        total_seconds = self.runtime_seconds % 60
-
-        # Create the label to display the time
-        self.timer_label = QLabel(f"00:00 / {total_minutes:02}:{total_seconds:02}", parent)
-        self.timer_label.setAlignment(Qt.AlignHCenter)
-        self.timer_label.setFont(QFont("Times", 24))
-        self.timer_label.setGeometry(position[0], position[1], dimensions[0], dimensions[1])
-
-        # Create a QTimer that updates the label every second
-        self.timer = QTimer(parent)
-        self.timer.timeout.connect(self.update_timer)  # connect the timeout signal to our update function
-        self.timer.start(1000)  # 1000 milliseconds = 1 second
-
-        self.elapsed_time = 0
-        self.restart_on_timeout = restart_on_timeout
-
-        self.paused = False
-
-    def setFont(self, font : QFont):
-        self.timer_label.setFont(font)
-
-    def pause(self):
-        self.paused = True
-
-    def unpause(self):
-        self.paused = False
-
-    def restart(self):
-        total_minutes = self.runtime_seconds // 60
-        total_seconds = self.runtime_seconds % 60
-
-        self.timer.start(1000)  # 1000 milliseconds = 1 second
-
-        self.elapsed_time = 0
-        self.timer_label.setText(f"00:00 / {total_minutes:02}:{total_seconds:02}")
-
-    def update_timer(self):
-        total_minutes = self.runtime_seconds // 60
-        total_seconds = self.runtime_seconds % 60
-
-        if self.elapsed_time < self.runtime_seconds and not self.paused:
-            self.elapsed_time += 1
-
-            minutes = self.elapsed_time // 60
-            seconds = self.elapsed_time % 60
-
-            self.timer_label.setText(f"{minutes:02}:{seconds:02} / {total_minutes:02}:{total_seconds:02}")  # Format as MM:SS
-            # check for the timer ending
-            if self.elapsed_time >= self.runtime_seconds:
-                self.timer_label.setText(f"{total_minutes:02}:{total_seconds:02} / {total_minutes:02}:{total_seconds:02}")  # Format as MM:SS
-                self.timeout()
-
-    def timeout(self):
-        self.timeout_function()
-
-        if self.restart_on_timeout:
-            self.restart()
+default_button_bg = "4caf50"  # hex value
 
 
 class SliderWindow(QDialog):
@@ -111,9 +48,9 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(f'QMainWindow {{background: {backgroundColour}}}')
 
 
-        # text thing
-        self.text_edit = TypingBox()
-        self.setCentralWidget(self.text_edit)
+        # saves the current page
+        self.current_widget_page = None
+        self.enter_home()
 
         # settings
         self.volume = 50
@@ -122,8 +59,29 @@ class MainWindow(QMainWindow):
         # menu bar
         self.create_menu()
 
-        # timer
-        self.timer = Timer(10, self, self.timeout, False, (200, 0))
+    def enter_typing(self):
+        text_edit = TypingBox(self.timeout)
+
+        self.setCentralWidget(text_edit)
+        self.current_widget_page = text_edit
+
+    def enter_home(self):
+        # home screen
+        home_layout = QVBoxLayout()
+        # title
+        title_text = QLabel("Typesmith", self)
+        title_text.setAlignment(Qt.AlignCenter)
+        home_layout.addWidget(title_text)
+        # typing game
+        typing_button = QPushButton("Typing Frenzy", self)
+        typing_button.clicked.connect(self.enter_typing)
+        home_layout.addWidget(typing_button)
+        # create home screen
+        home_screen = QWidget()
+        home_screen.setLayout(home_layout)
+
+        self.setCentralWidget(home_screen)
+        self.current_widget_page = home_screen
 
     def timeout(self):
         print("timeout")
@@ -163,8 +121,8 @@ class MainWindow(QMainWindow):
         text_window = SliderWindow(self, (10, 18), self.text_size, "Text Size", self.set_text_size)
         text_window.show()
 
-    def home(self):
-        print("Go to home screen")
+    def toggle_mistake_highlight(self):
+        self.text_edit.toggle_mistake_override()
 
     def add_settings_menu(self, menu_bar):
         settings_menu = menu_bar.addMenu(QIcon("assets/settings_icon.png"), "Settings")
@@ -177,11 +135,15 @@ class MainWindow(QMainWindow):
         text_action.triggered.connect(self.show_text_size)
         settings_menu.addAction(text_action)
 
+        mistake_action = QAction(QIcon("assets/error_icon.png"), "Toggle mistake highlight", self)
+        mistake_action.triggered.connect(self.toggle_mistake_highlight)
+        settings_menu.addAction(mistake_action)
+
     def create_menu(self):
         menu_bar = self.menuBar()
 
         home_action = QAction(QIcon("assets/home_icon.png"), "Home", self)
-        home_action.triggered.connect(self.home)
+        home_action.triggered.connect(self.enter_home)
         menu_bar.addAction(home_action)
 
         self.add_file_menu(menu_bar)
