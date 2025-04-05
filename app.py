@@ -7,7 +7,6 @@ from typingBox import TypingBox
 
 default_button_bg = "4caf50"  # hex value
 
-
 class SliderWindow(QDialog):
     def __init__(self, parent=None, value_range=(0, 100), value=50, text="", onChanged=None):
         super().__init__(parent)
@@ -47,6 +46,9 @@ class HomeWidget(QWidget):
         self.setFont(font)
 
     def reset(self):
+        return
+
+    def toggle_mistake_override(self, value):
         return
 
 
@@ -132,7 +134,7 @@ class MainWindow(QMainWindow):
         text_window.show()
 
     def toggle_mistake_highlight(self):
-        self.text_edit.toggle_mistake_override()
+        self.current_widget_page.toggle_mistake_override()
 
     def add_settings_menu(self, menu_bar):
         settings_menu = menu_bar.addMenu(QIcon("assets/settings_icon.png"), "Settings")
