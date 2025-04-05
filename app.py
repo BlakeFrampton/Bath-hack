@@ -15,6 +15,7 @@ class SliderWindow(QDialog):
         super().__init__(parent)
         self.setWindowTitle(text)
         self.setFixedSize(250, 120)
+        print("intit")
 
         self.parent_window = parent
 
@@ -84,7 +85,10 @@ class MainWindow(QMainWindow):
         self.create_menu()
 
     def enter_typing(self):
-        text = "some text about catapults"
+        self.difficultWords = []
+        self.difficultScores = []
+        # text = "Some text about catapults text"
+        text = ""
         text_edit = TypingBox(
                               self.timeout,
                               self.timer,
@@ -123,12 +127,17 @@ class MainWindow(QMainWindow):
 
         return final_accuracy, final_wpm
 
-    def timeout(self):
+    def timeout(self, difficultWords):
         # calculate statistics
         accuracy, wpm = self.get_statistics()
+        print(difficultWords)
 
         print("Final accuracy: " + str(accuracy))
         print("Final wpm: " + str(wpm))
+        
+        #Create a new function to get the difficult words, current words etccc all needs to go here
+        
+
 
         # go back to the home screen
         self.enter_home()

@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 class TypingBox(QTextEdit):
 
-    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="computer science hackathon", use_text="", **_):
+    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="computer science hackathon", use_text="", difficultWords = [], difficultScores = [], **_):
         super().__init__()
 
         backgroundColour = "#5475A0"
@@ -21,11 +21,12 @@ class TypingBox(QTextEdit):
         self.mistakes = 0
         self.correct = 0
         self.typed = ""
+        self.difficultWords = difficultWords
+        self.difficultScores = difficultScores
 
         if use_text == "":
-            #textToType = self.getText(word_count,
-                                      #generation_type, generation_type_content)
-            #self.setTextToType(textToType)
+            textToType = self.getText(word_count, generation_type, generation_type_content, self.difficultWords)
+            self.setTextToType(textToType)
             pass
         else:
             self.setTextToType(use_text)
@@ -37,8 +38,7 @@ class TypingBox(QTextEdit):
         self.mistakesOverride = False
 
         #Creating arrays for difficult words 
-        self.difficultWords = []
-        self.difficultsScore = []
+        self.newDiffWords = []
 
 
         # timer
@@ -61,10 +61,12 @@ class TypingBox(QTextEdit):
 
     def end_typing(self):
         # self.typed, self._textToType, self.correct, self.mistakes
+        text = self._textToType[0:self.pos]
+
 
 
         # call the function for when the typing is finished
-        self.end_type_func()
+        self.end_type_func(self.difficultWords)
 
     def set_font(self, font):
         self.setFont(font)
@@ -91,99 +93,109 @@ class TypingBox(QTextEdit):
         cursor = self.textCursor()
         format = QTextCharFormat()
 
-        pos = cursor.position()
+        self.pos = cursor.position()
 
         self.smoothScroll()
 
         self.timer.unpause()
 
+        print("before try")
         try:
-            if e.text() == self._textToType[pos]:  # If input is correct
+            if e.text() == self._textToType[self.pos]:  # If input is correct
                 correctFontColour = "#3EE094"
                 format.setForeground(QBrush(QColor(correctFontColour)))
                 cursor.deleteChar()
                 self.typed += e.text()
                 cursor.setCharFormat(format)
                 cursor.insertText(e.text())
-                cursor.setPosition(pos + 1)
-                pos += 1
+                cursor.setPosition(self.pos + 1)
+                self.pos += 1
                 self.correct += 1
                 self.streak += 1
             elif ord(e.text()) == 8:  # Backspace
-                if pos > 0:
-                    self.backspace(cursor, pos, format)
+                if self.pos > 0:
+                    self.backspace(cursor, self.pos, format)
             elif ord(e.text()) == 127:  # Ctrl-backspace
                 startingSpace = False
-                if self._textToType[pos - 1] == " ":  # If pressed while on a
+                if self._textToType[self.pos - 1] == " ":  # If pressed while on a
                     # space delete from space to start of previous word
                     startingSpace = True
-                while startingSpace or (pos > 0 and
-                                        self._textToType[pos - 1] != " "):
+                while startingSpace or (self.pos > 0 and
+                                        self._textToType[self.pos - 1] != " "):
                     # Backspace until start of text or word
                     startingSpace = False
-                    self.backspace(cursor, pos, format)
-                    pos = cursor.position()
+                    self.backspace(cursor, self.pos, format)
+                    self.pos = cursor.position()
             elif e.key() == Qt.Key_Backtab:  # Shift + tab
                 self.reset()
             else:
-                #Code for when they typed a wrong character:
-                current_word = ""
-                #Getting characters before _textToType[pos] 
-                prev = pos - 1
-                startFound = False 
-                start = ""
-                while startFound != True:
-                    if prev == 0: 
-                        start =  self._textToType[prev] + start
-                        startFound = True 
-                    elif self._textToType[prev].isalpha():
-                        prev = prev - 1
-                        start = self._textToType[prev] + start
+                if self._textToType[self.pos].isalpha():
+                    current_word = ""
+                    #Getting characters before _textToType[pos] 
+                    prev = self.pos - 1
+                    startFound = False 
+                    start = ""
+                    while startFound != True:
+                        if self.pos == 0 or prev==0: 
+                            start =  self._textToType[prev] + start
+                            startFound = True 
+                        elif self._textToType[prev].isalpha():
+                            start = self._textToType[prev] + start
+                            prev = prev - 1
+                        else:
+                            startFound = True
+                    
+                    #Getting characters in the word after 
+                    post = self.pos + 1
+                    endFound = False 
+                    end = ""
+                    while endFound != True:
+                        if self.pos == len(self._textToType) -1: 
+                            end = end + self._textToType[post]
+                            endFound = True 
+                        elif self._textToType[post].isalpha():
+                            end = end + self._textToType[post]
+                            post = post + 1
+                        else:
+                            endFound = True
+                    
+                    
+                    current_word = start + self._textToType[self.pos] + end
+
+                    if current_word in self.difficultWords:
+                        index = self.difficultWords.index(current_word)
+                        before = self.difficultScores[index]
+                        #Change 
+                        self.difficultScores[index] = before - 3
                     else:
-                        startFound = True
-                
-                #Getting characters in the word after 
-                post = pos + 1 
-                endFound = False 
-                end = ""
-                while endFound != True:
-                    if post == len(self._textToType) -1: 
-                        end =  self._textToType[post] + end
-                        endFound = True 
-                    elif self._textToType[prev].isalpha():
-                        post = post + 1
-                        end = self._textToType[post] + end
-                    else:
-                        endFound = True
-                
-                current_word = start + self._textToType[pos] + end
+                        self.difficultWords.append(current_word)
+                        self.difficultScores.append(-3)
+                        self.newDiffWords.append(current_word)
+                    
+                    print("start: " + start)
+                    print("end: " +end)
+                    print("curr word: " + current_word)
 
-                #Adding it to mistakes array and -3
-
-                self.difficultWords.append(current_word)
-                self.difficultsScore.append(-3)
-                print(self.difficultWords)
-                print(self.difficultsScore)
-
-                
 
                 self.mistakes += 1
                 self.streak = 0
                 incorrectFontColour = "#D9818A"
                 format.setForeground(QBrush(QColor(incorrectFontColour)))
+                print("delete char")
                 cursor.deleteChar()
                 self.typed += e.text()
                 cursor.setCharFormat(format)
-                if self._textToType[pos] == " ":
+                if self._textToType[self.pos] == " ":
                     cursor.insertText("_")
                 else:
-                    cursor.insertText(self._textToType[pos])
-                cursor.setPosition(pos + 1)
-                pos += 1
+                    cursor.insertText(self._textToType[self.pos])
+                cursor.setPosition(self.pos + 1)
+                self.pos += 1
         except TypeError:
+            print("catch")
             pass
 
-        if pos == len(self._textToType):
+        if self.pos == len(self._textToType):
             cursor.setPosition(0)  # Loop Back
             self.setTextCursor(cursor)
             self.end_typing()
@@ -197,7 +209,7 @@ class TypingBox(QTextEdit):
             scrollBar = self.verticalScrollBar()
             scrollBar.setValue(scrollBar.value() + 20)
 
-    def backspace(self, cursor, pos, notformat):
+    def backspace(self, cursor, pos):
         format = QTextCharFormat()
 
         indx = (pos - 1) % len(self._textToType)
@@ -225,8 +237,7 @@ class TypingBox(QTextEdit):
     def mousePressEvent(self, _: QMouseEvent, /) -> None:
         pass
 
-    def getText(self, word_count, generation_type, generation_type_content):
-        difficultWords = ["cappuccino", "spring", "crisp", "establishment"]
+    def getText(self, word_count, generation_type, generation_type_content, difficultWords):
         if generation_type == "theme":
             return textGenerator.getTextFromTheme(generation_type_content,
                                                   difficultWords, word_count)
