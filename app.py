@@ -93,6 +93,7 @@ class MainWindow(QMainWindow):
                               self.generation_type_content,
                               use_text=text
                               )
+        text_edit.setStyleSheet("margin: 100px 50px 100px 50px")
         self.setCentralWidget(text_edit)
 
         self.timer.show()
@@ -263,6 +264,8 @@ class MainWindow(QMainWindow):
 
     def create_menu(self):
         menu_bar = self.menuBar()
+        menu_bar.setStyleSheet(f"QMenuBar {{background:'#3F5878'}}")#
+        menu_bar.setFixedHeight(40)
 
         home_action = QAction(QIcon("assets/home_icon.png"), "Home", self)
         home_action.triggered.connect(self.enter_home)
