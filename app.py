@@ -139,7 +139,7 @@ class MainWindow(QMainWindow):
         # typing game
         typing_button = QPushButton("Typing Frenzy", self)
         typing_button.setFont(QFont("Times", 100))
-        typing_button.setStyleSheet(f"color: white; background-color: {self.backgroundColour}")
+        typing_button.setStyleSheet(f"color: white; background-color: '#3F5878'")
         typing_button.clicked.connect(self.enter_typing)
         home_layout.addWidget(typing_button)
         # create home screen
