@@ -20,6 +20,7 @@ class TypingBox(QTextEdit):
         self.streak = 0
         self.mistakes = 0
         self.correct = 0
+        self.typed = ""
         # textToType = self.getText()
         # self.setTextToType(textToType)
         self.setFont(QFont("Times", 50, QFont.Bold))
@@ -54,6 +55,7 @@ class TypingBox(QTextEdit):
             if e.text() == self._textToType[pos]:
                 format.setForeground(QBrush(QColor("green")))
                 cursor.deleteChar()
+                self.typed += e.text()
                 cursor.setCharFormat(format)
                 cursor.insertText(e.text())
                 cursor.setPosition(pos + 1)
@@ -80,6 +82,7 @@ class TypingBox(QTextEdit):
                 self.streak = 0
                 format.setForeground(QBrush(QColor("red")))
                 cursor.deleteChar()
+                self.typed += e.text()
                 cursor.setCharFormat(format)
                 cursor.insertText(self._textToType[pos])
                 cursor.setPosition(pos + 1)
@@ -90,7 +93,7 @@ class TypingBox(QTextEdit):
         if pos == len(self._textToType):
             cursor.setPosition(0)  # Loop Back
             self.setTextCursor(cursor)
-            finishedTest(self.toPlainText(), self._textToType, self.correct, self.mistakes)
+            finishedTest(self.typed, self._textToType, self.correct, self.mistakes)
             self.streak = 0
             self.correct = 0
             self.mistakes = 0
@@ -105,6 +108,7 @@ class TypingBox(QTextEdit):
         indx = (pos - 1) % len(self._textToType)
         cursor.setPosition(indx)
         cursor.deleteChar()
+        self.typed = self.typed[:-1]
         cursor.setCharFormat(format)
         cursor.insertText(self._textToType[indx])
         cursor.setPosition(indx)
