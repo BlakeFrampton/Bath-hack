@@ -85,6 +85,9 @@ class MainWindow(QMainWindow):
         # menu bar
         self.create_menu()
 
+        self.difficultWords = []
+        self.difficultScores = []
+
     def enter_typing(self):
         self.difficultWords = []
         self.difficultScores = []
@@ -124,8 +127,6 @@ class MainWindow(QMainWindow):
         accuracy = (1 - mistakes / total_typed) * 100
         accuracy = max(accuracy, 0)  # Ensure accuracy doesn't go below 0%
         final_accuracy = round(accuracy, 1)
-
-        print(self.timer.elapsed_time, correct, final_accuracy)
 
         wpm = (correct / 6) * (final_accuracy / 100) / minutes_taken
         score = round(wpm)
@@ -170,6 +171,9 @@ class MainWindow(QMainWindow):
         title_text.setAlignment(Qt.AlignCenter)
 
         home_layout.addWidget(title_text)
+
+        # focus on the title widget once it has loaded
+        QTimer.singleShot(0, title_text.setFocus)
 
     def make_data_display_boxes(self, home_layout, accuracy=None, wpm=None, score=None):
         if accuracy is None:
@@ -238,6 +242,7 @@ class MainWindow(QMainWindow):
 
     def restart(self):
         self.current_widget_page.reset()
+        self.timer.restart()  # restart the timer as well
         print("restart?")
 
     def add_file_menu(self, menu_bar):
