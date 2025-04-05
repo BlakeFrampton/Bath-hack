@@ -15,8 +15,7 @@ class TypingBox(QTextEdit):
         pos = cursor.position()
         format = QTextCharFormat()
         format.setFontWeight(QFont().bold())
-        if pos == len(self._textToType) - 1:
-            self.textCursor().setPosition(0)  # Loop Back
+
 
         if e.text() == self._textToType[pos]:
             format.setForeground(QBrush(QColor("green")))
@@ -32,6 +31,11 @@ class TypingBox(QTextEdit):
             cursor.setCharFormat(format)
             cursor.insertText(e.text())
             cursor.setPosition(pos + 1)
+        
+        if pos == len(self._textToType) - 1:
+            cursor.setPosition(0)  # Loop Back
+            self.setTextCursor(cursor)
+            print("new pos: ", cursor.position())
 
     def insertFromMimeData(self, _) -> None:
         pass  # Disable Pasting
