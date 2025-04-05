@@ -1,4 +1,5 @@
-from PySide6.QtGui import QBrush, QColor, QFont, QKeyEvent, QTextCharFormat
+from PySide6.QtGui import (QBrush, QColor, QFont, QKeyEvent,
+                           QMouseEvent, QTextCharFormat)
 from PySide6.QtWidgets import QApplication, QTextEdit
 import sys
 
@@ -11,10 +12,15 @@ class TypingBox(QTextEdit):
         self.setTextToType("Test")
         self.setOverwriteMode(True)
 
+    def mousePressEvent(self, _: QMouseEvent, /) -> None:
+        pass
+
     def keyPressEvent(self, e: QKeyEvent) -> None:
         cursor = self.textCursor()
         pos = cursor.position()
         format = QTextCharFormat()
+        mistake = 0
+        correct = 0
 
         if e.text() == self._textToType[pos]:
             format.setForeground(QBrush(QColor("green")))
@@ -22,16 +28,28 @@ class TypingBox(QTextEdit):
             cursor.setCharFormat(format)
             cursor.insertText(e.text())
             cursor.setPosition(pos + 1)
-        elif e.text() == "":
-            pass
+            pos += 1
+            correct += 1
+        elif ord(e.text()) == 8:  # Backspace
+            indx = (pos - 1) % len(self._textToType)
+            print(indx)
+            cursor.setPosition(indx)
+            cursor.deleteChar()
+            cursor.setCharFormat(format)
+            cursor.insertText(self._textToType[indx])
+            cursor.setPosition(indx)
+            self.setTextCursor(cursor)
         else:
+            print((e.text().isprintable()))
+            mistake += 1
             format.setForeground(QBrush(QColor("red")))
             cursor.deleteChar()
             cursor.setCharFormat(format)
             cursor.insertText(e.text())
             cursor.setPosition(pos + 1)
+            pos += 1
 
-        if pos == len(self._textToType) - 1:
+        if pos == len(self._textToType):
             cursor.setPosition(0)  # Loop Back
             self.setTextCursor(cursor)
             print("new pos: ", cursor.position())
