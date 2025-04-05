@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 class TypingBox(QTextEdit):
 
-    def __init__(self,word_count, generation_type, generation_type_content, **_):
+    def __init__(self, word_count, generation_type, generation_type_content, end_type_func, **_):
         super().__init__()
 
         backgroundColour = "#282E78"
@@ -20,8 +20,8 @@ class TypingBox(QTextEdit):
         self.mistakes = 0
         self.correct = 0
         self.typed = ""
-        textToType = self.getText(word_count,
-                                  generation_type, generation_type_content)
+        # textToType = self.getText(word_count, generation_type, generation_type_content)
+        textToType = "I would love some text to type here!"
         self.setTextToType(textToType)
         self.setFont(QFont("Times", 50, QFont.Bold))
         # self.setTextToType("""In ancient times, the invention of the catapult revolutionized warfare. This powerful siege engine could launch projectiles with incredible force, causing devastation to enemy fortifications. The sound of the catapult releasing was a loud noise that struck fear into the hearts of those under attack. Additionally, when the projectiles hit their target, clouds of smoke and dust would fill the air. The catapult's ability to hurl heavy objects over long distances made it a formidable weapon in countless battles throughout history.""")
@@ -29,25 +29,27 @@ class TypingBox(QTextEdit):
         self.mistakesOverride = False
 
         # timer
-        self.timeout_func = timeout_func
+        self.end_type_func = end_type_func
+
+        # set cursor to the start
+        cursor = self.textCursor()
+        cursor.setPosition(0)
+        self.setTextCursor(cursor)
+
+    def get_mistakes(self):
+        return self.mistakes
+
+    def get_text_to_type(self):
+        return self._textToType
 
     def end_typing(self):
         # self.typed, self._textToType, self.correct, self.mistakes
-        accuracy = 0
-        accuracy = (1 - mistakes / len(target)) * 100
-        accuracy = max(accuracy, 0)  # Ensure accuracy doesn't go below 0%
-        final_accuracy = round(accuracy, 1)
-        
-        wpm = (len(target) / 6) * (accuracy / 100)
-        final_wpm = round(wpm)
 
-        print("Final accurcay: " + str(final_accuracy))
-        print("Final wpm: " + str(final_wpm))
 
-        self.timeout_func()
+        # call the function for when the typing is finished
+        self.end_type_func()
 
     def set_font(self, font):
-        self.timer.setFont(font)
         self.setFont(font)
 
     def toggle_mistake_override(self):
@@ -67,9 +69,6 @@ class TypingBox(QTextEdit):
         cursor = self.textCursor()
         while cursor.position() > 0:
             self.backspace(cursor, cursor.position(), format)
-
-        # reset the timer
-        self.timer.restart()
 
     def keyPressEvent(self, e: QKeyEvent) -> None:
         cursor = self.textCursor()
