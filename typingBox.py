@@ -129,8 +129,9 @@ class TypingBox(QTextEdit):
         
 
         try:
-            if e.text() == self._textToType[pos]:
-                format.setForeground(QBrush(QColor("green")))
+            if e.text() == self._textToType[pos]: # If input is correct
+                fontColour = "#28785e"
+                format.setForeground(QBrush(QColor(fontColour)))
                 cursor.deleteChar()
                 self.typed += e.text()
                 cursor.setCharFormat(format)

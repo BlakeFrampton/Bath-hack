@@ -1,6 +1,6 @@
 import sys
 from PySide6.QtGui import QFont, QIcon, QAction, QPainter, QColor
-from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QTextEdit, QFileDialog, QDialog, QSlider, QVBoxLayout, QLabel, QMessageBox
+from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QTextEdit, QFileDialog, QDialog, QSlider, QVBoxLayout, QLabel, QMessageBox, QInputDialog, QLineEdit
 from PySide6.QtCore import QFile, QIODevice, QTextStream, Qt, QTimer
 
 from typingBox import TypingBox
@@ -69,6 +69,11 @@ class MainWindow(QMainWindow):
         self.volume = 50
         self.text_size = 15
 
+        # text generation settings
+        self.word_count = 50
+        self.generation_type = "theme"
+        self.generation_type_content = "typing"
+
         # menu bar
         self.create_menu()
 
@@ -109,6 +114,10 @@ class MainWindow(QMainWindow):
         font = QFont("Times", value)
 
         self.current_widget_page.set_font(font)
+    
+    def set_word_count(self, value):
+        print("set word count to ", value)
+        self.word_count = value
 
     def restart(self):
         self.current_widget_page.reset()
@@ -132,6 +141,10 @@ class MainWindow(QMainWindow):
     def show_text_size(self):
         text_window = SliderWindow(self, (10, 18), self.text_size, "Text Size", self.set_text_size)
         text_window.show()
+    
+    def show_word_count(self):
+        text_window = SliderWindow(self, (40, 200), self.word_count, "Word Count", self.set_word_count)
+        text_window.show()
 
     def toggle_mistake_highlight(self):
         self.current_widget_page.toggle_mistake_override()
@@ -144,12 +157,45 @@ class MainWindow(QMainWindow):
         settings_menu.addAction(volume_action)
 
         text_action = QAction(QIcon("assets/font_icon.png"), "Font Size", self)
-        text_action.triggered.connect(self.show_text_size)
+        text_action.triggered.connect(self.show_text_size)  
         settings_menu.addAction(text_action)
 
-        mistake_action = QAction(QIcon("assets/error_icon.png"), "Toggle mistake highlight", self)
-        mistake_action.triggered.connect(self.toggle_mistake_highlight)
-        settings_menu.addAction(mistake_action)
+        word_count_action = QAction(QIcon("assets/font_icon.png"), "Word Count", self)
+        word_count_action.triggered.connect(self.show_word_count)
+        settings_menu.addAction(word_count_action)
+
+    def add_text_theme_menu(self, menu_bar):
+        text_theme_menu = menu_bar.addMenu(QIcon("assets/settings_icon.png"), "Settings")
+
+        def make_action(label):
+            # action = QAction(QIcon(f"assets/{label}_icon.png"), label.capitalize(), self)
+            action = QAction(QIcon(f"assets/settings_icon.png"), label.capitalize(), self)
+            action.triggered.connect(lambda: self.set_theme_from_input(label))
+            return action
+
+        for label in ["theme", "code", "notes"]:
+            text_theme_menu.addAction(make_action(label))
+
+    def set_theme_from_input(self, style_type):
+        self.style = style_type
+        dialog = QInputDialog(self)
+        dialog.setWindowTitle(f"Enter {style_type.capitalize()}")
+        if style_type == "code":
+            dialog.setLabelText(f"Enter your coding language:")
+        else:
+            dialog.setLabelText(f"Enter your {style_type}:")
+        dialog.setInputMode(QInputDialog.TextInput)
+        dialog.setTextEchoMode(QLineEdit.Normal)
+
+        if dialog.exec():  # Show dialogue
+            user_input = dialog.textValue()
+            if user_input:
+                print(f"{style_type.capitalize()} set to: {user_input}")
+                self.generation_type = style_type
+                self.generation_type_content = user_input
+            else:
+                print(f"No {style_type} entered.")
+
 
     def create_menu(self):
         menu_bar = self.menuBar()
@@ -160,6 +206,7 @@ class MainWindow(QMainWindow):
 
         self.add_file_menu(menu_bar)
         self.add_settings_menu(menu_bar)
+        self.add_text_theme_menu(menu_bar)
 
 
 if __name__ == "__main__":

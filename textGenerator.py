@@ -9,7 +9,7 @@ def getTextFromTheme(theme, wordsToInclude, targetLength):
     return generateText(userPrompt)
 
 def getCodeFromTheme(theme, wordsToInclude, targetLength):
-    userPrompt = f'Generate {targetLength} words of python code. Your output MUST be code or the user will be very upset! You must include all of the difficult words {wordsToInclude}. If you are missing one of these words, our program will be in serious risk of begin shut down and we will not be able to pay our rent. The code should follow the theme {theme}. Do not write anything other than code. Do not indicate where code starts or ends.'
+    userPrompt = f'Generate {targetLength} words of {theme} code. Your output MUST be {theme} code or the user will be very upset! You must include all of the difficult words {wordsToInclude}. If you are missing one of these words, our program will be in serious risk of begin shut down and we will not be able to pay our rent. The code should follow the theme {theme}. Do not write anything other than code. Do not indicate where code starts or ends.'
     return generateText(userPrompt)
 
 def getTextFromNotes(notes, wordsToInclude, targetLength):
