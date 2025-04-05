@@ -29,6 +29,10 @@ class TypingBox(QTextEdit):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.mistakesOverride = False
 
+        #Creating arrays for difficult words 
+        self.difficultWords = []
+        self.difficultsScore = []
+
 
         # timer
         self.end_type_func = end_type_func
@@ -115,6 +119,47 @@ class TypingBox(QTextEdit):
             elif e.key() == Qt.Key_Backtab:  # Shift + tab
                 self.reset()
             else:
+                #Code for when they typed a wrong character:
+                current_word = ""
+                #Getting characters before _textToType[pos] 
+                prev = pos - 1
+                startFound = False 
+                start = ""
+                while startFound != True:
+                    if prev == 0: 
+                        start =  self._textToType[prev] + start
+                        startFound = True 
+                    elif self._textToType[prev].isalpha():
+                        prev = prev - 1
+                        start = self._textToType[prev] + start
+                    else:
+                        startFound = True
+                
+                #Getting characters in the word after 
+                post = pos + 1 
+                endFound = False 
+                end = ""
+                while endFound != True:
+                    if post == len(self._textToType) -1: 
+                        end =  self._textToType[post] + end
+                        endFound = True 
+                    elif self._textToType[prev].isalpha():
+                        post = post + 1
+                        end = self._textToType[post] + end
+                    else:
+                        endFound = True
+                
+                current_word = start + self._textToType[pos] + end
+
+                #Adding it to mistakes array and -3
+
+                self.difficultWords.append(current_word)
+                self.difficultsScore.append(-3)
+                print(self.difficultWords)
+                print(self.difficultsScore)
+
+                
+
                 self.mistakes += 1
                 self.streak = 0
                 format.setForeground(QBrush(QColor("red")))

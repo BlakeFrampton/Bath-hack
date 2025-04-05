@@ -241,7 +241,7 @@ class MainWindow(QMainWindow):
         if dialog.exec():  # Show dialogue
             user_input = dialog.textValue()
             if user_input:
-                print(f"{style_type.capitalize()} set to: {user_input}")
+                print(f"{style_type.capitalize()} set to: {user_input}") 
                 self.generation_type = style_type
                 self.generation_type_content = user_input
             else:
