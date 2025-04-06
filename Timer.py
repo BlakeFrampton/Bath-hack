@@ -3,12 +3,15 @@ from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QLabel
 from PySide6.QtCore import QTimer
 # by default, the text challenge will close after 5 minutes
+
 class Timer:
     def __init__(self, runtime_seconds=300, parent=None, timeout=None, restart_on_timeout=False, position=(0, 0), dimensions=(200, 50)):
         self.timeout_function = timeout
         self.runtime_seconds = runtime_seconds
         total_minutes = self.runtime_seconds // 60
         total_seconds = self.runtime_seconds % 60
+
+        self.dt = 500  # milliseconds per clock pulse
 
         # Create the label to display the time
         self.timer_label = QLabel(f"00:00 / {total_minutes:02}:{total_seconds:02}", parent)
@@ -45,7 +48,7 @@ class Timer:
         total_minutes = self.runtime_seconds // 60
         total_seconds = self.runtime_seconds % 60
 
-        self.timer.start(1000)  # 1000 milliseconds = 1 second
+        self.timer.start(self.dt)  # 1000 milliseconds = 1 second
 
         self.elapsed_time = 0
         self.timer_label.setText(f"00:00 / {total_minutes:02}:{total_seconds:02}")
@@ -55,10 +58,10 @@ class Timer:
         total_seconds = self.runtime_seconds % 60
 
         if self.elapsed_time < self.runtime_seconds and not self.paused:
-            self.elapsed_time += 1
+            self.elapsed_time += self.dt / 1000
 
-            minutes = self.elapsed_time // 60
-            seconds = self.elapsed_time % 60
+            minutes = int(self.elapsed_time // 60)
+            seconds = int(self.elapsed_time % 60)
 
             self.timer_label.setText(f"{minutes:02}:{seconds:02} / {total_minutes:02}:{total_seconds:02}")  # Format as MM:SS
             # check for the timer ending

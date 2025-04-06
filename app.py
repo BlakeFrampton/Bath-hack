@@ -5,6 +5,7 @@ from PySide6.QtCore import Qt, QTimer
 
 from typingBox import TypingBox
 from Timer import Timer
+from Animation import ConfettiOverlay
 
 default_button_bg = "4caf50"  # hex value
 
@@ -156,7 +157,7 @@ class MainWindow(QMainWindow):
 
     def make_type_box_title(self, home_layout):
         self.timer.pause()
-        self.timer.runtime_seconds = 1
+        self.timer.runtime_seconds = 0.5  # 0.5 seconds before it backspaces
         self.timer.restart_on_timeout = True
         self.timer.hide()
 
@@ -170,9 +171,15 @@ class MainWindow(QMainWindow):
         self.timer.timeout_function = timeout_func
         self.timer.unpause()
         self.timer.restart()
-        self.timer.show()
 
-        title_text.end_type_func = title_text.reset
+        # confetti appears when you type the game name
+        confetti = ConfettiOverlay(self)
+
+        def complete_title():
+            confetti.start_confetti()
+            title_text.reset()
+
+        title_text.end_type_func = complete_title
 
         title_text.setFont(QFont("Times", 100))
         title_text.setStyleSheet(f"color: white;background-color: {self.backgroundColour}")
