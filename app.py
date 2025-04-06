@@ -222,22 +222,18 @@ class MainWindow(QMainWindow):
         QTimer.singleShot(0, title_text.setFocus)
 
     def make_data_display_boxes(self, home_layout, accuracy=None, wpm=None):
-        if accuracy is None:
-            accuracy = "100"
-        if wpm is None:
-            wpm = "N/A"
+        if accuracy is not None and wpm is not None:
+            accuracy_text = QLabel(str(accuracy)+"%", self)
+            accuracy_text.setFont(QFont("Times", 50))
+            accuracy_text.setAlignment(Qt.AlignCenter)
 
-        accuracy_text = QLabel(str(accuracy)+"%", self)
-        accuracy_text.setFont(QFont("Times", 50))
-        accuracy_text.setAlignment(Qt.AlignCenter)
-
-        wpm_text = QLabel(str(wpm)+" wpm", self)
-        wpm_text.setFont(QFont("Times", 50))
-        wpm_text.setAlignment(Qt.AlignCenter)
+            wpm_text = QLabel(str(wpm)+" wpm", self)
+            wpm_text.setFont(QFont("Times", 50))
+            wpm_text.setAlignment(Qt.AlignCenter)
 
 
-        home_layout.addWidget(accuracy_text)
-        home_layout.addWidget(wpm_text)
+            home_layout.addWidget(accuracy_text)
+            home_layout.addWidget(wpm_text)
 
     def enter_home(self, accuracy=None, wpm=None):
         # home screen
