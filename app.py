@@ -7,6 +7,8 @@ from typingBox import TypingBox
 from Timer import Timer
 from Animation import ConfettiOverlay, FireworkOverlay
 
+import time
+
 default_button_bg = "4caf50"  # hex value
 
 
@@ -68,6 +70,18 @@ class MainWindow(QMainWindow):
         self.showFullScreen()  # makes the window fullscreen
         self.setStyleSheet(f'QMainWindow {{background: {self.backgroundColour}}}')
 
+
+        # show the home screen
+        loading_img = QLabel(self)
+        dims = self.width(), self.height()
+        loading_img.setGeometry(0, 0, dims[0], dims[1])
+        loading_img.setPixmap(QPixmap("assets/loading_screen.png").scaled(dims[0], dims[1]))
+        loading_screen = QWidget()
+        self.setCentralWidget(loading_screen)
+
+        time.sleep(2)
+
+        
         # saves the current page
         self.timer = Timer(parent=self, runtime_seconds=30, position=(650, 0), timeout=self.timeout)
         self.timer.pause()
