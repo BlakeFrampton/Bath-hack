@@ -119,16 +119,17 @@ class TypingBox(QTextEdit):
                     self.backspace()
             elif ord(e.text()) == 127:  # Ctrl-backspace
                 startingSpace = False
-                if self._textToType[self.pos - 1] == " ":  # If pressed while on a
-                    # space delete from space to start of previous word
+                 # If pressed while on a space or tab delete from space to start of previous word
+                if self._textToType[self.pos - 1] == " " or self._textToType[self.pos - 1] == "\t": 
                     startingSpace = True
                 while startingSpace or (self.pos > 0 and
-                                        self._textToType[self.pos - 1] != " "):
+                                        (self._textToType[self.pos - 1] != " " or self._textToType[self.pos - 1] != "\t")):
                     # Backspace until start of text or word
                     startingSpace = False
                     self.backspace()
                     cursor = self.textCursor()
-                    self.pos = cursor.position()
+                    self.pos = cursor.position()#
+                    print("pos: ", self.pos)
             elif e.key() == Qt.Key_Backtab:  # Shift + tab
                 self.reset()
             else:
@@ -172,8 +173,8 @@ class TypingBox(QTextEdit):
                         self.difficultWords.append(current_word)
                         
                     #Getting rid of words at the start of the list. 
-                    if len(self.difficultWords) >= 15:
-                        while len(self.difficultWords) > 15:
+                    if len(self.difficultWords) >= 30:
+                        while len(self.difficultWords) > 30:
                             self.difficultWords.pop(0)
                     
             
@@ -192,14 +193,14 @@ class TypingBox(QTextEdit):
                 cursor.deleteChar()
                 self.typed += e.text()
                 cursor.setCharFormat(format)
-                if self._textToType[self.pos] == " ":
+                if self._textToType[self.pos] == " " or self._textToType[self.pos] == "\t" :
                     cursor.insertText("_")
                 else:
                     cursor.insertText(self._textToType[self.pos])
                 # cursor.setPosition(self.pos + 1)
                 cursor.movePosition(cursor.MoveOperation.Right)
                 self.pos += 1
-        except TypeError:
+        except (TypeError, IndexError):
             pass
 
         if self.pos == len(self._textToType):
