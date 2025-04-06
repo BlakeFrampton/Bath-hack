@@ -70,21 +70,6 @@ class MainWindow(QMainWindow):
         self.showFullScreen()  # makes the window fullscreen
         self.setStyleSheet(f'QMainWindow {{background: {self.backgroundColour}}}')
 
-<<<<<<< HEAD
-=======
-        # show the home screen
-        self.timerDisabled = False
-        loading_img = QLabel(self)
-        dims = self.width(), self.height()
-        loading_img.setGeometry(0, 0, dims[0], dims[1])
-        loading_img.setPixmap(QPixmap("assets/loading_screen.png").scaled(dims[0], dims[1]))
-        loading_screen = QWidget()
-        self.setCentralWidget(loading_screen)
-
-        time.sleep(2)
-
-        
->>>>>>> 936221d79384d79d7201af0287957f147a352fea
         # saves the current page
         self.timer = Timer(parent=self, runtime_seconds=30, position=(700, 20), timeout=self.timeout)
         self.timer.pause()
