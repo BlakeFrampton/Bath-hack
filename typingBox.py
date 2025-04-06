@@ -119,11 +119,11 @@ class TypingBox(QTextEdit):
                     self.backspace()
             elif ord(e.text()) == 127:  # Ctrl-backspace
                 startingSpace = False
-                if self._textToType[self.pos - 1] == " ":  # If pressed while on a
+                if self._textToType[self.pos - 1] == " " or self._textToType[self.pos - 1] == "\t":  # If pressed while on a
                     # space delete from space to start of previous word
                     startingSpace = True
                 while startingSpace or (self.pos > 0 and
-                                        self._textToType[self.pos - 1] != " "):
+                                        self._textToType[self.pos - 1] != " " and self._textToType[self.pos - 1] != "\t"):
                     # Backspace until start of text or word
                     startingSpace = False
                     self.backspace()
