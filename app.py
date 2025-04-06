@@ -70,8 +70,8 @@ class MainWindow(QMainWindow):
         self.showFullScreen()  # makes the window fullscreen
         self.setStyleSheet(f'QMainWindow {{background: {self.backgroundColour}}}')
 
-
         # show the home screen
+        self.timerDisabled = False
         loading_img = QLabel(self)
         dims = self.width(), self.height()
         loading_img.setGeometry(0, 0, dims[0], dims[1])
@@ -131,7 +131,10 @@ class MainWindow(QMainWindow):
             background-color: #5475A0""")
         self.setCentralWidget(text_edit)
 
-        self.timer.show()
+        if (self.timerDisabled):
+            self.timer.hide()
+        else:
+            self.timer.show()
         self.timer.timeout_function = self.timeout
         self.timer.runtime_seconds = self.runtime  # one minute to get through the test
         self.timer.restart_on_timeout = False
@@ -417,6 +420,16 @@ class MainWindow(QMainWindow):
         text_action.triggered.connect(self.show_text_size)
         menu_bar.addAction(text_action)
 
+    def alternateTimer(self):
+        if self.timerDisabled:
+            self.timer.unpause()
+            self.timer.show()
+            self.timerDisabled = False
+        else:
+            self.timer.pause()
+            self.timer.hide()
+            self.timerDisabled = True
+
     def add_special_actions(self, menu_bar):
 
         word_count_action = QAction(self.make_icon("assets/word_count_icon.png"),
@@ -424,6 +437,10 @@ class MainWindow(QMainWindow):
         word_count_action.triggered.connect(self.show_word_count)
         menu_bar.addAction(word_count_action)
 
+        enable_timer_action = QAction(self.make_icon("assets/timer_icon.png"),
+                                    "Timer Visible", self)
+        enable_timer_action.triggered.connect(self.alternateTimer)
+        menu_bar.addAction(enable_timer_action)
         menu_bar.addSeparator()
 
         def make_action(label1):
