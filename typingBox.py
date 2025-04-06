@@ -67,7 +67,7 @@ class TypingBox(QTextEdit):
 
 
         # call the function for when the typing is finished
-        self.end_type_func()
+        self.end_type_func(self)
 
     def set_font(self, font):
         self.setFont(font)
