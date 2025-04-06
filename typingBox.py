@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 class TypingBox(QTextEdit):
 
-    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="A hackathon at the Uni of Bath called Bath Hack. This does not take place in a bath. We are in the city of Bath", use_text="", key_function = None, difficultWords = ["Bath Hack", "coding"], text_size=50, **_):
+    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="Typing tests", use_text="", key_function = None, difficultWords = ["Typing", "coding"], text_size=50, **_):
         super().__init__()
 
         self.defaultFontColour = "#A7F1CE"
@@ -121,7 +121,7 @@ class TypingBox(QTextEdit):
                 if self._textToType[self.pos - 1] == " " or self._textToType[self.pos - 1] == "\t": 
                     startingSpace = True
                 while startingSpace or (self.pos > 0 and
-                                        (self._textToType[self.pos - 1] != " " or self._textToType[self.pos - 1] != "\t")):
+                                        (self._textToType[self.pos - 1] != " " and self._textToType[self.pos - 1] != "\t")):
                     # Backspace until start of text or word
                     startingSpace = False
                     self.backspace()
@@ -184,6 +184,14 @@ class TypingBox(QTextEdit):
 
                     if "Typesmith" in self.difficultWords:
                         self.difficultWords.remove("Typesmith")
+
+                    #Remove anything non alphaneumeric 
+                    for i in self.difficultWords:
+                        if i.isalpha():
+                            continue 
+                        else:
+                            self.difficultWords.remove(i)
+
 
 
 

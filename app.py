@@ -65,13 +65,28 @@ class MainWindow(QMainWindow):
     def __init__(self):
         self.backgroundColour = "#2E4057"
         super().__init__()
-        self.setWindowTitle("Error 404")
+        self.setWindowTitle("TypeSmith")
         # self.setGeometry(100, 100, 800, 600)
         self.showFullScreen()  # makes the window fullscreen
         self.setStyleSheet(f'QMainWindow {{background: {self.backgroundColour}}}')
 
+<<<<<<< HEAD
+=======
+        # show the home screen
+        self.timerDisabled = False
+        loading_img = QLabel(self)
+        dims = self.width(), self.height()
+        loading_img.setGeometry(0, 0, dims[0], dims[1])
+        loading_img.setPixmap(QPixmap("assets/loading_screen.png").scaled(dims[0], dims[1]))
+        loading_screen = QWidget()
+        self.setCentralWidget(loading_screen)
+
+        time.sleep(2)
+
+        
+>>>>>>> 936221d79384d79d7201af0287957f147a352fea
         # saves the current page
-        self.timer = Timer(parent=self, runtime_seconds=30, position=(650, 0), timeout=self.timeout)
+        self.timer = Timer(parent=self, runtime_seconds=30, position=(700, 20), timeout=self.timeout)
         self.timer.pause()
         self.timer.hide()
 
@@ -127,7 +142,10 @@ class MainWindow(QMainWindow):
             background-color: #5475A0""")
         self.setCentralWidget(text_edit)
 
-        self.timer.show()
+        if (self.timerDisabled):
+            self.timer.hide()
+        else:
+            self.timer.show()
         self.timer.timeout_function = self.timeout
         self.timer.runtime_seconds = self.runtime  # one minute to get through the test
         self.timer.restart_on_timeout = False
@@ -215,22 +233,18 @@ class MainWindow(QMainWindow):
         QTimer.singleShot(0, title_text.setFocus)
 
     def make_data_display_boxes(self, home_layout, accuracy=None, wpm=None):
-        if accuracy is None:
-            accuracy = "100"
-        if wpm is None:
-            wpm = "N/A"
+        if accuracy is not None and wpm is not None:
+            accuracy_text = QLabel(str(accuracy)+"%", self)
+            accuracy_text.setFont(QFont("Times", 50))
+            accuracy_text.setAlignment(Qt.AlignCenter)
 
-        accuracy_text = QLabel(str(accuracy)+"%", self)
-        accuracy_text.setFont(QFont("Times", 50))
-        accuracy_text.setAlignment(Qt.AlignCenter)
-
-        wpm_text = QLabel(str(wpm)+" wpm", self)
-        wpm_text.setFont(QFont("Times", 50))
-        wpm_text.setAlignment(Qt.AlignCenter)
+            wpm_text = QLabel(str(wpm)+" wpm", self)
+            wpm_text.setFont(QFont("Times", 50))
+            wpm_text.setAlignment(Qt.AlignCenter)
 
 
-        home_layout.addWidget(accuracy_text)
-        home_layout.addWidget(wpm_text)
+            home_layout.addWidget(accuracy_text)
+            home_layout.addWidget(wpm_text)
 
     def enter_home(self, accuracy=None, wpm=None):
         # home screen
@@ -413,6 +427,16 @@ class MainWindow(QMainWindow):
         text_action.triggered.connect(self.show_text_size)
         menu_bar.addAction(text_action)
 
+    def alternateTimer(self):
+        if self.timerDisabled:
+            self.timer.unpause()
+            self.timer.show()
+            self.timerDisabled = False
+        else:
+            self.timer.pause()
+            self.timer.hide()
+            self.timerDisabled = True
+
     def add_special_actions(self, menu_bar):
 
         word_count_action = QAction(self.make_icon("assets/word_count_icon.png"),
@@ -420,6 +444,10 @@ class MainWindow(QMainWindow):
         word_count_action.triggered.connect(self.show_word_count)
         menu_bar.addAction(word_count_action)
 
+        enable_timer_action = QAction(self.make_icon("assets/timer_icon.png"),
+                                    "Timer Visible", self)
+        enable_timer_action.triggered.connect(self.alternateTimer)
+        menu_bar.addAction(enable_timer_action)
         menu_bar.addSeparator()
 
         def make_action(label1):
