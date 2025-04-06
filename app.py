@@ -5,7 +5,7 @@ from PySide6.QtCore import Qt, QTimer, QSize
 
 from typingBox import TypingBox
 from Timer import Timer
-from Animation import ConfettiOverlay, FireworkOverlay
+from Animation import ConfettiOverlay, FireworkOverlay, FadeScreen
 
 import time
 
@@ -70,18 +70,6 @@ class MainWindow(QMainWindow):
         self.showFullScreen()  # makes the window fullscreen
         self.setStyleSheet(f'QMainWindow {{background: {self.backgroundColour}}}')
 
-
-        # show the home screen
-        loading_img = QLabel(self)
-        dims = self.width(), self.height()
-        loading_img.setGeometry(0, 0, dims[0], dims[1])
-        loading_img.setPixmap(QPixmap("assets/loading_screen.png").scaled(dims[0], dims[1]))
-        loading_screen = QWidget()
-        self.setCentralWidget(loading_screen)
-
-        time.sleep(2)
-
-        
         # saves the current page
         self.timer = Timer(parent=self, runtime_seconds=30, position=(650, 0), timeout=self.timeout)
         self.timer.pause()
@@ -91,7 +79,6 @@ class MainWindow(QMainWindow):
 
         self.show_help = False
         self.help_pic = QLabel(self)
-
 
         # settings
         self.volume = 50
@@ -110,6 +97,15 @@ class MainWindow(QMainWindow):
         self.create_menu()
 
         self.difficultWords = []
+
+        # fade the loading screen into the home screen
+        loading_img = QLabel(self)
+        dims = self.width(), self.height()
+        loading_img.setGeometry(0, 0, dims[0], dims[1])
+        loading_img.setPixmap(QPixmap("assets/TypeSmithLogo.png").scaledToHeight(dims[1]))
+        loading_screen = FadeScreen(self, loading_img)
+        loading_screen.show()
+        loading_screen.fade_out()
 
     def enter_typing(self):
         self.difficultWords = []

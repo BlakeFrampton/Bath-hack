@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QApplication, QGraphicsScene, QGraphicsView, QGraphicsRectItem, QWidget, QVBoxLayout, QPushButton
-from PySide6.QtCore import QTimer, Qt, QPointF
+from PySide6.QtWidgets import QApplication, QGraphicsOpacityEffect, QLabel, QGraphicsScene, QGraphicsView, QGraphicsRectItem, QWidget, QVBoxLayout, QPushButton
+from PySide6.QtCore import QTimer, Qt, QPointF, QEasingCurve, QPropertyAnimation
 from PySide6.QtGui import QColor
 import random, math
 
@@ -145,3 +145,31 @@ class FireworkOverlay(QWidget):
             self.confetti_items.clear()
             self.hide()
 
+
+class FadeScreen(QWidget):
+    def __init__(self, parent, widget):
+        super().__init__(parent)
+        self.setGeometry(parent.rect())
+        self.scene = QGraphicsScene(self)
+        self.view = QGraphicsView(self.scene, self)
+        self.view.setGeometry(self.rect())
+
+        layout = QVBoxLayout()
+        layout.addWidget(widget, alignment=Qt.AlignCenter)
+        self.view.setLayout(layout)
+
+        # Add opacity effect
+        self.opacity_effect = QGraphicsOpacityEffect(self)
+        # self.view.setGraphicsEffect(self.opacity_effect)
+        widget.setGraphicsEffect(self.opacity_effect)
+
+        # Animation setup
+        self.fade_animation = QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.fade_animation.setDuration(1500)  # in milliseconds
+        self.fade_animation.setStartValue(1.0)
+        self.fade_animation.setEndValue(0.0)
+        self.fade_animation.setEasingCurve(QEasingCurve.Type.InOutQuad)
+        self.fade_animation.finished.connect(self.close)  # optional: close the widget after fade
+
+    def fade_out(self):
+        self.fade_animation.start()
