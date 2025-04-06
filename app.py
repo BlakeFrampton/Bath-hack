@@ -65,7 +65,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         self.backgroundColour = "#2E4057"
         super().__init__()
-        self.setWindowTitle("Error 404")
+        self.setWindowTitle("TypeSmith")
         # self.setGeometry(100, 100, 800, 600)
         self.showFullScreen()  # makes the window fullscreen
         self.setStyleSheet(f'QMainWindow {{background: {self.backgroundColour}}}')
