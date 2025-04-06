@@ -366,13 +366,15 @@ class MainWindow(QMainWindow):
 
     def add_base_menu_items(self, menu_bar):
 
+        exit_action = QAction(self.make_icon("assets/red_exit_icon.png"), "Exit", self)
+        exit_action.triggered.connect(self.close)
+        menu_bar.addAction(exit_action)
+
+        menu_bar.addSeparator()
+
         home_action = QAction(self.make_icon("assets/home_icon.png"), "Home", self)
         home_action.triggered.connect(self.enter_home)
         menu_bar.addAction(home_action)
-
-        exit_action = QAction(self.make_icon("assets/exit_icon.png"), "Exit", self)
-        exit_action.triggered.connect(self.close)
-        menu_bar.addAction(exit_action)
 
         help_action = QAction(self.make_icon("assets/help_icon.png"), "Exit", self)
         help_action.triggered.connect(self.help)
