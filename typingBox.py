@@ -67,7 +67,7 @@ class TypingBox(QTextEdit):
 
 
         # call the function for when the typing is finished
-        self.end_type_func()
+        self.end_type_func(self)
 
     def set_font(self, font):
         self.setFont(font)
@@ -119,16 +119,17 @@ class TypingBox(QTextEdit):
                     self.backspace()
             elif ord(e.text()) == 127:  # Ctrl-backspace
                 startingSpace = False
-                if self._textToType[self.pos - 1] == " ":  # If pressed while on a
-                    # space delete from space to start of previous word
+                 # If pressed while on a space or tab delete from space to start of previous word
+                if self._textToType[self.pos - 1] == " " or self._textToType[self.pos - 1] == "\t": 
                     startingSpace = True
                 while startingSpace or (self.pos > 0 and
-                                        self._textToType[self.pos - 1] != " "):
+                                        (self._textToType[self.pos - 1] != " " or self._textToType[self.pos - 1] != "\t")):
                     # Backspace until start of text or word
                     startingSpace = False
                     self.backspace()
                     cursor = self.textCursor()
-                    self.pos = cursor.position()
+                    self.pos = cursor.position()#
+                    print("pos: ", self.pos)
             elif e.key() == Qt.Key_Backtab:  # Shift + tab
                 self.reset()
             else:
@@ -192,7 +193,7 @@ class TypingBox(QTextEdit):
                 cursor.deleteChar()
                 self.typed += e.text()
                 cursor.setCharFormat(format)
-                if self._textToType[self.pos] == " ":
+                if self._textToType[self.pos] == " " or self._textToType[self.pos] == "\t" :
                     cursor.insertText("_")
                 else:
                     cursor.insertText(self._textToType[self.pos])

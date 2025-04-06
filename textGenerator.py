@@ -30,6 +30,7 @@ def generateText(userPrompt):
         ]
     )
     reply = response.choices[0].message.content
+    reply = reply.replace("    ", "\t")
     return reply
 
 # difficultWords = ['hydroxide', 'glucose', 'cowabunga', 'orange']

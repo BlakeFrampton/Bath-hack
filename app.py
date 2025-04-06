@@ -143,7 +143,7 @@ class MainWindow(QMainWindow):
 
         return round(final_accuracy, 2), round(wpm), round(score, 1)
 
-    def finish_typing(self):
+    def finish_typing(self, typing: TypingBox):
         self.timeout()
 
     def timeout(self):
@@ -169,7 +169,13 @@ class MainWindow(QMainWindow):
         self.timer.restart_on_timeout = True
         self.timer.hide()
 
-        title_text = TypingBox(None, self.timer, key_function=self.timer.restart, use_text="Typesmith")
+        confetti = FireworkOverlay(self)
+
+        def complete_title(type: TypingBox):
+            # confetti.start_confetti()
+            confetti.start_firework(self.width() // 2, self.height() // 2)
+            type.reset()
+        title_text = TypingBox(complete_title, self.timer, key_function=self.timer.restart, use_text="Typesmith")
         # title_text.setGeometry(0, 0, self.width(), 20)
 
         def timeout_func():
@@ -182,14 +188,6 @@ class MainWindow(QMainWindow):
 
         # confetti appears when you type the game name
         # confetti = ConfettiOverlay(self)
-        confetti = FireworkOverlay(self)
-
-        def complete_title():
-            # confetti.start_confetti()
-            confetti.start_firework(self.width() // 2, self.height() // 2)
-            title_text.reset()
-
-        title_text.end_type_func = complete_title()
 
         title_text.setFont(QFont("Times", self.text_size))
         title_text.setStyleSheet(f"color: white;background-color: {self.backgroundColour}")
