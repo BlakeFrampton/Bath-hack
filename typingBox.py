@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 class TypingBox(QTextEdit):
 
-    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="A hackathon at the Uni of Bath called Bath Hack. This does not take place in a bath. We are in the city of Bath", use_text="", key_function = None, difficultWords = ["Bath Hack", "coding"], **_):
+    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="A hackathon at the Uni of Bath called Bath Hack. This does not take place in a bath. We are in the city of Bath", use_text="", key_function = None, difficultWords = ["Bath Hack", "coding"], text_size=50, **_):
         super().__init__()
 
         # backgroundColour = "#5475A0"
@@ -31,7 +31,7 @@ class TypingBox(QTextEdit):
             pass
         else:
             self.setTextToType(use_text)
-        self.setFont(QFont("Times", 50, QFont.Bold))
+        self.setFont(QFont("Times", text_size, QFont.Bold))
         # self.setTextToType("""In ancient times, the invention of the catapult revolutionized warfare. This powerful siege engine could launch projectiles with incredible force, causing devastation to enemy fortifications. The sound of the catapult releasing was a loud noise that struck fear into the hearts of those under attack. Additionally, when the projectiles hit their target, clouds of smoke and dust would fill the air. The catapult's ability to hurl heavy objects over long distances made it a formidable weapon in countless battles throughout history.""")
         # self.setTextToType("Shorter text")
 
