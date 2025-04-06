@@ -83,7 +83,7 @@ class MainWindow(QMainWindow):
 
         
         # saves the current page
-        self.timer = Timer(parent=self, runtime_seconds=30, position=(700, 0), timeout=self.timeout)
+        self.timer = Timer(parent=self, runtime_seconds=30, position=(700, 20), timeout=self.timeout)
         self.timer.pause()
         self.timer.hide()
 
