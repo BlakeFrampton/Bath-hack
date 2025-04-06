@@ -75,6 +75,9 @@ class MainWindow(QMainWindow):
 
         self.current_widget_page = None
 
+        self.show_help = False
+        self.help_pic = QLabel(self)
+
 
         # settings
         self.volume = 50
@@ -123,6 +126,11 @@ class MainWindow(QMainWindow):
 
         self.current_widget_page = text_edit
         QTimer.singleShot(0, text_edit.setFocus) #Focuses typing test after it has loaded
+
+        # raise the timer to the top of the widget stack
+        self.timer.timer_label.raise_()
+        # bring the help picture in front of the menu and timer
+        self.help_pic.raise_()
 
     def make_icon(self, path):
         pixmap = QPixmap(path).scaled(self.icon_size, self.icon_size)
@@ -243,6 +251,11 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(home_screen)
         self.current_widget_page = home_screen
 
+        # raise the timer to the top of the widget stack
+        self.timer.timer_label.raise_()
+        # bring the help picture in front of the menu and timer
+        self.help_pic.raise_()
+
     def set_volume(self, value):
         print("set volume to", value)
         self.volume = value
@@ -301,8 +314,10 @@ class MainWindow(QMainWindow):
         text_window.show()
     
     def show_word_count(self):
+        word_icon = self.make_icon("assets/word_count_icon.png")
         text_window = SliderWindow(self, (40, 200), self.word_count,
-                                   "Word Count", self.set_word_count)
+                                   "Word Count", self.set_word_count,
+                                   word_icon)
         text_window.show()
 
     def toggle_mistake_highlight(self):
@@ -359,11 +374,16 @@ class MainWindow(QMainWindow):
                 print(f"No {style_type} entered.")
 
     def help(self):
-        pic = QLabel(self)
-        pad = 50
-        pic.setGeometry(pad, pad, self.width() - 2 * pad, self.height() - 2 * pad)
-        pic.setPixmap(QPixmap("assets/FingerplacementGuide.png").scaled(self.width() - 2 * pad, self.height() - 2 * pad))
-        pic.show()
+        if not self.show_help:
+            pad = 50
+            dims = self.width() - 2 * pad, self.height() - 2 * pad - self.icon_size
+            self.help_pic.setGeometry(pad, self.icon_size + pad, dims[0], dims[1])
+            self.help_pic.setPixmap(QPixmap("assets/FingerplacementGuide.png").scaled(dims[0], dims[1]))
+            self.help_pic.show()
+        else:
+            self.help_pic.hide()
+
+        self.show_help = not self.show_help
 
     def add_base_menu_items(self, menu_bar):
 
@@ -427,9 +447,6 @@ class MainWindow(QMainWindow):
 
         # menu_bar.frameSize()
         # menu_bar.setBaseSize(QSize(self.icon_size, self.icon_size))
-
-        # raise the timer to the top of the widget stack
-        self.timer.timer_label.raise_()
 
 
 if __name__ == "__main__":
