@@ -109,7 +109,8 @@ class TypingBox(QTextEdit):
                 self.typed += e.text()
                 cursor.setCharFormat(format)
                 cursor.insertText(e.text())
-                cursor.setPosition(self.pos + 1)
+                cursor.movePosition(cursor.MoveOperation.Right)
+                # cursor.setPosition(self.pos + 1)
                 self.pos += 1
                 self.correct += 1
                 self.streak += 1
@@ -191,7 +192,8 @@ class TypingBox(QTextEdit):
                     cursor.insertText("_")
                 else:
                     cursor.insertText(self._textToType[self.pos])
-                cursor.setPosition(self.pos + 1)
+                # cursor.setPosition(self.pos + 1)
+                cursor.movePosition(cursor.MoveOperation.Right)
                 self.pos += 1
         except TypeError:
             print("catch")
@@ -233,7 +235,8 @@ class TypingBox(QTextEdit):
         format.setForeground(QBrush(QColor(self.defaultFontColour)))
         cursor.setCharFormat(format)
         cursor.insertText(self._textToType[indx])
-        cursor.setPosition(indx)
+        cursor.movePosition(cursor.MoveOperation.Left)
+        # cursor.setPosition(indx)
         
         self.setTextCursor(cursor)
 
