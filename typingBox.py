@@ -1,3 +1,4 @@
+from PySide6 import QtCore
 from PySide6.QtGui import (QBrush, QColor, QFont, QFontMetrics, QKeyEvent,
                            QMouseEvent, QTextCharFormat, Qt)
 from PySide6.QtWidgets import QApplication, QTextEdit
@@ -114,10 +115,7 @@ class TypingBox(QTextEdit):
                 self.pos += 1
                 self.correct += 1
                 self.streak += 1
-            elif ord(e.text()) == 8:  # Backspace
-                if self.pos > 0:
-                    self.backspace()
-            elif ord(e.text()) == 127:  # Ctrl-backspace
+            elif (e.keyCombination().key()==Qt.Key.Key_Backspace and e.keyCombination().keyboardModifiers() == Qt.KeyboardModifier.ControlModifier):# Ctrl-backspace
                 startingSpace = False
                  # If pressed while on a space or tab delete from space to start of previous word
                 if self._textToType[self.pos - 1] == " " or self._textToType[self.pos - 1] == "\t": 
@@ -130,6 +128,9 @@ class TypingBox(QTextEdit):
                     cursor = self.textCursor()
                     self.pos = cursor.position()#
                     print("pos: ", self.pos)
+            elif ord(e.text()) == 8:  # Backspace
+                if self.pos > 0:
+                    self.backspace()
             elif e.key() == Qt.Key_Backtab:  # Shift + tab
                 self.reset()
             else:
@@ -140,9 +141,9 @@ class TypingBox(QTextEdit):
                     startFound = False 
                     start = ""
                     while startFound != True:
-                        if self.pos == 0 or prev==0: 
+                        if self.pos == 0 or prev==0:
                             start =  self._textToType[prev] + start
-                            startFound = True 
+                            startFound = True
                         elif self._textToType[prev].isalpha():
                             start = self._textToType[prev] + start
                             prev = prev - 1
@@ -151,12 +152,12 @@ class TypingBox(QTextEdit):
                     
                     #Getting characters in the word after 
                     post = self.pos + 1
-                    endFound = False 
+                    endFound = False
                     end = ""
                     while not endFound and post < len(self._textToType):
-                        if self.pos == len(self._textToType) -1: 
+                        if self.pos == len(self._textToType) -1:
                             end = end + self._textToType[post]
-                            endFound = True 
+                            endFound = True
                         elif self._textToType[post].isalpha():
                             end = end + self._textToType[post]
                             post = post + 1
@@ -178,10 +179,10 @@ class TypingBox(QTextEdit):
                             self.difficultWords.pop(0)
                     
             
-                    if "hTypesmith" in self.difficultWords: 
+                    if "hTypesmith" in self.difficultWords:
                         self.difficultWords.remove("hTypesmith")
 
-                    if "Typesmith" in self.difficultWords: 
+                    if "Typesmith" in self.difficultWords:
                         self.difficultWords.remove("Typesmith")
 
 
