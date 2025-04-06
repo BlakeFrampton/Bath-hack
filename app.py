@@ -1,11 +1,11 @@
 import sys
 from PySide6.QtGui import QBrush, QFont, QIcon, QAction, QColor
 from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QDialog, QSlider, QVBoxLayout, QHBoxLayout, QLabel, QInputDialog, QLineEdit
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, QSize
 
 from typingBox import TypingBox
 from Timer import Timer
-from Animation import ConfettiOverlay
+from Animation import ConfettiOverlay, FireworkOverlay
 
 default_button_bg = "4caf50"  # hex value
 
@@ -62,7 +62,8 @@ class MainWindow(QMainWindow):
         self.backgroundColour = "#2E4057"
         super().__init__()
         self.setWindowTitle("Error 404")
-        self.setGeometry(100, 100, 800, 600)
+        # self.setGeometry(100, 100, 800, 600)
+        self.showFullScreen()  # makes the window fullscreen
         self.setStyleSheet(f'QMainWindow {{background: {self.backgroundColour}}}')
 
         # saves the current page
@@ -78,6 +79,7 @@ class MainWindow(QMainWindow):
         self.volume = 50
         self.text_size = 15
         self.runtime = 30
+        self.icon_size = 24  # pixels per side - square icons
 
         # text generation settings
         self.word_count = 50
@@ -173,10 +175,12 @@ class MainWindow(QMainWindow):
         self.timer.restart()
 
         # confetti appears when you type the game name
-        confetti = ConfettiOverlay(self)
+        # confetti = ConfettiOverlay(self)
+        confetti = FireworkOverlay(self)
 
         def complete_title():
-            confetti.start_confetti()
+            # confetti.start_confetti()
+            confetti.start_firework(self.width() // 2, self.height() // 2)
             title_text.reset()
 
         title_text.end_type_func = complete_title
@@ -336,8 +340,9 @@ class MainWindow(QMainWindow):
                 print(f"No {style_type} entered.")
 
     def create_menu(self):
+        # icon images are 100x100 pixils
         menu_bar = self.menuBar()
-        menu_bar.setStyleSheet(f"QMenuBar {{background:'#3F5878'}}")
+        menu_bar.setStyleSheet(f"QMenuBar {{background:'#3F5878'}}; QMenuBar::item {{padding-left: 6px; padding-right: 6px; height: 60px;}}")
         menu_bar.setFixedHeight(40)
 
         home_action = QAction(QIcon("assets/home_icon.png"), "Home", self)
@@ -347,6 +352,9 @@ class MainWindow(QMainWindow):
         self.add_file_menu(menu_bar)
         self.add_settings_menu(menu_bar)
         self.add_text_theme_menu(menu_bar)
+
+        menu_bar.frameSize()
+        menu_bar.setBaseSize(QSize(self.icon_size, self.icon_size))
 
         # raise the timer to the top of the widget stack
         self.timer.timer_label.raise_()

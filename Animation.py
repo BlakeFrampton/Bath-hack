@@ -84,7 +84,7 @@ class FireworkConfetti(QGraphicsRectItem):
         angle = random.uniform(0, 2 * math.pi)
         speed = random.uniform(2, 6)
         self.velocity = QPointF(math.cos(angle) * speed, math.sin(angle) * speed)
-        self.gravity = 0.15
+        self.gravity = 0.45
 
     def update_motion(self):
         self.setPos(self.pos() + self.velocity)
@@ -92,6 +92,7 @@ class FireworkConfetti(QGraphicsRectItem):
 
     def is_off_screen(self, scene_height):
         return self.pos().y() > scene_height + 50
+
 
 class FireworkOverlay(QWidget):
     def __init__(self, parent):
