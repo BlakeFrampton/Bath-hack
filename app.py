@@ -1,6 +1,6 @@
 import sys
-from PySide6.QtGui import QBrush, QFont, QIcon, QAction, QColor
-from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QDialog, QSlider, QVBoxLayout, QHBoxLayout, QLabel, QInputDialog, QLineEdit
+from PySide6.QtGui import QBrush, QFont, QIcon, QAction, QColor, QPixmap
+from PySide6.QtWidgets import QMenu, QWidget, QToolBar, QApplication, QMainWindow, QPushButton, QDialog, QSlider, QVBoxLayout, QHBoxLayout, QLabel, QInputDialog, QLineEdit
 from PySide6.QtCore import Qt, QTimer, QSize
 
 from typingBox import TypingBox
@@ -12,7 +12,7 @@ default_button_bg = "4caf50"  # hex value
 
 class SliderWindow(QDialog):
     def __init__(self, parent=None, value_range=(0, 100),
-                 value=50, text="", onChanged=None):
+                 value=50, text="", onChanged=None, icon=None):
         super().__init__(parent)
         self.setWindowTitle(text)
         self.setFixedSize(250, 120)
@@ -23,7 +23,9 @@ class SliderWindow(QDialog):
         layout = QVBoxLayout(self)
 
         defaultFontColour = "#A7F1CE"
-        self.setTextColor(QColor(defaultFontColour))  #Default font color
+        self.setStyleSheet(f"color: {'000000'}; background-color: {default_button_bg}")
+        # self.setTextColor(QColor(defaultFontColour))  #Default font color
+        self.setWindowIcon(icon)
 
         self.text = text
 
@@ -67,7 +69,7 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(f'QMainWindow {{background: {self.backgroundColour}}}')
 
         # saves the current page
-        self.timer = Timer(parent=self, runtime_seconds=30, position=(500, 0), timeout=self.timeout)
+        self.timer = Timer(parent=self, runtime_seconds=30, position=(600, 0), timeout=self.timeout)
         self.timer.pause()
         self.timer.hide()
 
@@ -79,7 +81,7 @@ class MainWindow(QMainWindow):
         self.volume = 50
         self.text_size = 15
         self.runtime = 30
-        self.icon_size = 24  # pixels per side - square icons
+        self.icon_size = 60  # pixels per side - square icons
 
         # text generation settings
         self.word_count = 50
@@ -119,6 +121,10 @@ class MainWindow(QMainWindow):
 
         self.current_widget_page = text_edit
         QTimer.singleShot(0, text_edit.setFocus) #Focuses typing test after it has loaded
+
+    def make_icon(self, path):
+        pixmap = QPixmap(path).scaled(self.icon_size, self.icon_size)
+        return QIcon(pixmap)
 
     def get_statistics(self):
         mistakes = self.current_widget_page.get_mistakes()
@@ -258,25 +264,39 @@ class MainWindow(QMainWindow):
         print("restart?")
 
     def add_file_menu(self, menu_bar):
-        file_menu = menu_bar.addMenu(QIcon("assets/menu_icon.png"), "File")
+        # layout
+        layout = QVBoxLayout()
 
-        restart_action = QAction(QIcon("assets/restart_icon.png"),
+        # add menu button
+        file_menu_button = QPushButton(self.make_icon("assets/menu_icon.png"), "File", self)
+        file_menu = QMenu()
+        file_menu_button.setMenu(file_menu)
+        layout.addWidget(file_menu_button)
+
+        # menu_bar.addWidget(file_menu_button)
+
+        # add menu actions
+        restart_action = QAction(self.make_icon("assets/restart_icon.png"),
                                  "Restart", self)
         restart_action.triggered.connect(self.restart)
         file_menu.addAction(restart_action)
 
-        exit_action = QAction(QIcon("assets/exit_icon.png"), "Exit", self)
+        exit_action = QAction(self.make_icon("assets/exit_icon.png"), "Exit", self)
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
 
     def show_volume(self):
+        volume_icon = self.make_icon("assets/volume_icon.png")
         volume_window = SliderWindow(self, (1, 100),
-                                     self.volume, "Volume", self.set_volume)
+                                     self.volume, "Volume", self.set_volume,
+                                     volume_icon)
         volume_window.show()
 
     def show_text_size(self):
+        font_icon = self.make_icon("assets/font_icon.png")
         text_window = SliderWindow(self, (10, 18), self.text_size,
-                                   "Text Size", self.set_text_size)
+                                   "Text Size", self.set_text_size,
+                                   font_icon)
         text_window.show()
     
     def show_word_count(self):
@@ -288,28 +308,28 @@ class MainWindow(QMainWindow):
         self.current_widget_page.toggle_mistake_override()
 
     def add_settings_menu(self, menu_bar):
-        settings_menu = menu_bar.addMenu(QIcon("assets/settings_icon.png"),
+        settings_menu = menu_bar.addMenu(self.make_icon("assets/settings_icon.png"),
                                          "Settings")
 
-        volume_action = QAction(QIcon("assets/volume_icon"), "Volume", self)
+        volume_action = QAction(self.make_icon("assets/volume_icon"), "Volume", self)
         volume_action.triggered.connect(self.show_volume)
         settings_menu.addAction(volume_action)
 
-        text_action = QAction(QIcon("assets/font_icon.png"), "Font Size", self)
+        text_action = QAction(self.make_icon("assets/font_icon.png"), "Font Size", self)
         text_action.triggered.connect(self.show_text_size)
         settings_menu.addAction(text_action)
 
-        word_count_action = QAction(QIcon("assets/font_icon.png"),
+        word_count_action = QAction(self.make_icon("assets/word_count.png"),
                                     "Word Count", self)
         word_count_action.triggered.connect(self.show_word_count)
         settings_menu.addAction(word_count_action)
 
     def add_text_theme_menu(self, menu_bar):
-        text_theme_menu = menu_bar.addMenu(QIcon("assets/generation_icon.png"),
+        text_theme_menu = menu_bar.addMenu(self.make_icon("assets/generation_icon.png"),
                                            "Settings")
 
         def make_action(label):
-            action = QAction(QIcon(f"assets/{label}_icon.png"), label.capitalize(), self)
+            action = QAction(self.make_icon(f"assets/{label}_icon.png"), label.capitalize(), self)
             action.triggered.connect(lambda: self.set_theme_from_input(label))
             return action
 
@@ -326,7 +346,7 @@ class MainWindow(QMainWindow):
             dialog.setLabelText(f"Enter your {style_type}:")
         dialog.setInputMode(QInputDialog.TextInput)
         dialog.setTextEchoMode(QLineEdit.Normal)
-        dialog.setWindowIcon(QIcon(f"assets/{style_type}_icon.png"))
+        dialog.setWindowIcon(self.make_icon(f"assets/{style_type}_icon.png"))
 
         if dialog.exec():  # Show dialogue
             user_input = dialog.textValue()
@@ -337,22 +357,62 @@ class MainWindow(QMainWindow):
             else:
                 print(f"No {style_type} entered.")
 
-    def create_menu(self):
-        # icon images are 100x100 pixils
-        menu_bar = self.menuBar()
-        menu_bar.setStyleSheet(f"QMenuBar {{background:'#3F5878'}}; QMenuBar::item {{padding-left: 6px; padding-right: 6px; height: 60px;}}")
-        menu_bar.setFixedHeight(40)
+    def add_base_menu_items(self, menu_bar):
 
-        home_action = QAction(QIcon("assets/home_icon.png"), "Home", self)
+        home_action = QAction(self.make_icon("assets/home_icon.png"), "Home", self)
         home_action.triggered.connect(self.enter_home)
         menu_bar.addAction(home_action)
 
-        self.add_file_menu(menu_bar)
-        self.add_settings_menu(menu_bar)
-        self.add_text_theme_menu(menu_bar)
+        exit_action = QAction(self.make_icon("assets/exit_icon.png"), "Exit", self)
+        exit_action.triggered.connect(self.close)
+        menu_bar.addAction(exit_action)
 
-        menu_bar.frameSize()
-        menu_bar.setBaseSize(QSize(self.icon_size, self.icon_size))
+        menu_bar.addSeparator()
+
+        volume_action = QAction(self.make_icon("assets/volume_icon"), "Volume", self)
+        volume_action.triggered.connect(self.show_volume)
+        menu_bar.addAction(volume_action)
+
+        text_action = QAction(self.make_icon("assets/font_icon.png"), "Font Size", self)
+        text_action.triggered.connect(self.show_text_size)
+        menu_bar.addAction(text_action)
+
+    def add_special_actions(self, menu_bar):
+
+        word_count_action = QAction(self.make_icon("assets/word_count_icon.png"),
+                                    "Word Count", self)
+        word_count_action.triggered.connect(self.show_word_count)
+        menu_bar.addAction(word_count_action)
+
+        menu_bar.addSeparator()
+
+        def make_action(label1):
+            action = QAction(self.make_icon(f"assets/{label1}_icon.png"), label1.capitalize(), self)
+            action.triggered.connect(lambda: self.set_theme_from_input(label1))
+            return action
+
+        for label in ["theme", "code", "notes"]:
+            menu_bar.addAction(make_action(label))
+
+
+    def create_menu(self):
+        # icon images are 100x100 pixils
+        menu_bar = QToolBar("Main Toolbar")
+        menu_bar.setIconSize(QSize(self.icon_size, self.icon_size))
+        self.addToolBar(menu_bar)
+
+        # menu_bar = self.menuBar()
+        menu_bar.setStyleSheet(f"QMenuBar {{background:'#3F5878'}}; QMenuBar::item {{padding-left: 6px; padding-right: 6px; height: 60px;}}")
+        # menu_bar.setFixedHeight(self.icon_size)
+
+        self.add_base_menu_items(menu_bar)
+        self.add_special_actions(menu_bar)
+        # self.add_file_menu(menu_bar)
+        # self.add_settings_menu(menu_bar)
+        # self.add_text_theme_menu(menu_bar)
+
+        # menu_bar.frameSize()
+        # menu_bar.setBaseSize(QSize(self.icon_size, self.icon_size))
 
         # raise the timer to the top of the widget stack
         self.timer.timer_label.raise_()

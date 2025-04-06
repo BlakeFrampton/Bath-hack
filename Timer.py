@@ -16,7 +16,7 @@ class Timer:
         # Create the label to display the time
         self.timer_label = QLabel(f"00:00 / {total_minutes:02}:{total_seconds:02}", parent)
         self.timer_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-        self.timer_label.setStyleSheet("font-size: 24px;")
+        self.timer_label.setStyleSheet("font-size: 24px; color: white")
         self.timer_label.setGeometry(position[0], position[1], dimensions[0], dimensions[1])
 
         # Create a QTimer that updates the label every second
