@@ -92,11 +92,9 @@ class MainWindow(QMainWindow):
         self.create_menu()
 
         self.difficultWords = []
-        self.difficultScores = []
 
     def enter_typing(self):
         self.difficultWords = []
-        self.difficultScores = []
         # text = "Some text about catapults text"
         text = ""
         text_edit = TypingBox(
