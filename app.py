@@ -172,14 +172,14 @@ class MainWindow(QMainWindow):
         # calculate statistics
         accuracy, wpm= self.get_statistics()
 
-        print("Final accuracy: " + str(accuracy))
-        print("Final wpm: " + str(wpm))
+        # print("Final accuracy: " + str(accuracy))
+        # print("Final wpm: " + str(wpm))
 
         # update the difficult words
         new_difficult_words = self.current_widget_page.difficultWords.copy()
         self.difficultWords = list(set(self.difficultWords + new_difficult_words))
 
-        print(self.difficultWords)
+        # print(self.difficultWords)
 
         # go back to the home screen
         self.enter_home(accuracy, wpm)
@@ -260,11 +260,11 @@ class MainWindow(QMainWindow):
         self.help_pic.raise_()
 
     def set_volume(self, value):
-        print("set volume to", value)
+        # print("set volume to", value)
         self.volume = value
 
     def set_text_size(self, value):
-        print("set text size to", value)
+        # print("set text size to", value)
         self.text_size = value
         font = QFont("Times", value)
 
@@ -272,13 +272,13 @@ class MainWindow(QMainWindow):
         
 
     def set_word_count(self, value):
-        print("set word count to ", value)
+        # print("set word count to ", value)
         self.word_count = value
 
     def restart(self):
         self.current_widget_page.reset()
         self.timer.restart()  # restart the timer as well
-        print("restart?")
+        # print("restart?")
 
     def add_file_menu(self, menu_bar):
         # layouts
