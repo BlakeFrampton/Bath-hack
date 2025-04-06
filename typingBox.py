@@ -1,4 +1,4 @@
-from PySide6.QtGui import (QBrush, QColor, QFont, QKeyEvent,
+from PySide6.QtGui import (QBrush, QColor, QFont, QFontMetrics, QKeyEvent,
                            QMouseEvent, QTextCharFormat, Qt)
 from PySide6.QtWidgets import QApplication, QTextEdit
 import textGenerator
@@ -8,11 +8,9 @@ from dotenv import load_dotenv
 
 class TypingBox(QTextEdit):
 
-    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="computer science hackathon", use_text="", key_function = None, difficultWords = ["Bath Hack", "coding"], **_):
+    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="A hackathon at the Uni of Bath called Bath Hack. This does not take place in a bath. We are in the city of Bath", use_text="", key_function = None, difficultWords = ["Bath Hack", "coding"], text_size=50, **_):
         super().__init__()
 
-        backgroundColour = "#5475A0"
-        self.setStyleSheet(f'background-color: {backgroundColour}')
         self.defaultFontColour = "#A7F1CE"
         self.setTextColor(QColor(self.defaultFontColour))  #Default font color
 
@@ -23,20 +21,23 @@ class TypingBox(QTextEdit):
         self.typed = ""
         self.difficultWords = [] if difficultWords is None else difficultWords
 
+        QApplication.setCursorFlashTime(0)  # Disable blinking
+
         if use_text == "":
             textToType = self.getText(word_count, generation_type, generation_type_content, self.difficultWords)
             self.setTextToType(textToType)
             pass
         else:
             self.setTextToType(use_text)
-        self.setFont(QFont("Times", 50, QFont.Bold))
+        font = QFont("Times", text_size, QFont.Bold)
+        self.setFont(font)
         # self.setTextToType("""In ancient times, the invention of the catapult revolutionized warfare. This powerful siege engine could launch projectiles with incredible force, causing devastation to enemy fortifications. The sound of the catapult releasing was a loud noise that struck fear into the hearts of those under attack. Additionally, when the projectiles hit their target, clouds of smoke and dust would fill the air. The catapult's ability to hurl heavy objects over long distances made it a formidable weapon in countless battles throughout history.""")
         # self.setTextToType("Shorter text")
 
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.mistakesOverride = False
 
-        #Creating arrays for difficult words 
+        #Creating arrays for difficult words
         self.newDiffWords = []
 
         # key function - activated whenever a key is pressed
@@ -108,7 +109,8 @@ class TypingBox(QTextEdit):
                 self.typed += e.text()
                 cursor.setCharFormat(format)
                 cursor.insertText(e.text())
-                cursor.setPosition(self.pos + 1)
+                cursor.movePosition(cursor.MoveOperation.Right)
+                # cursor.setPosition(self.pos + 1)
                 self.pos += 1
                 self.correct += 1
                 self.streak += 1
@@ -194,7 +196,8 @@ class TypingBox(QTextEdit):
                     cursor.insertText("_")
                 else:
                     cursor.insertText(self._textToType[self.pos])
-                cursor.setPosition(self.pos + 1)
+                # cursor.setPosition(self.pos + 1)
+                cursor.movePosition(cursor.MoveOperation.Right)
                 self.pos += 1
         except TypeError:
             pass
@@ -206,6 +209,15 @@ class TypingBox(QTextEdit):
             self.streak = 0
             self.correct = 0
             self.mistakes = 0
+
+        self.updateCursorWidth()
+
+    def updateCursorWidth(self):
+        curs = self.textCursor()
+        char = curs.document().characterAt(curs.position())
+        font = self.currentFont()
+        width = QFontMetrics(font).horizontalAdvance(char)
+        self.setCursorWidth(width)
 
     def smoothScroll(self):
         cursorPos = self.mapToGlobal(self.cursorRect().topLeft()).y()
@@ -226,7 +238,8 @@ class TypingBox(QTextEdit):
         format.setForeground(QBrush(QColor(self.defaultFontColour)))
         cursor.setCharFormat(format)
         cursor.insertText(self._textToType[indx])
-        cursor.setPosition(indx)
+        cursor.movePosition(cursor.MoveOperation.Left)
+        # cursor.setPosition(indx)
         
         self.setTextCursor(cursor)
 

@@ -75,13 +75,14 @@ class MainWindow(QMainWindow):
 
         self.current_widget_page = None
 
-        self.enter_home()
 
         # settings
         self.volume = 50
-        self.text_size = 15
+        self.text_size = 50
         self.runtime = 30
         self.icon_size = 60  # pixels per side - square icons
+
+        self.enter_home()
 
         # text generation settings
         self.word_count = 50
@@ -104,7 +105,8 @@ class MainWindow(QMainWindow):
                               self.generation_type,
                               self.generation_type_content,
                               use_text=text,
-                              key_function=self.timer.unpause
+                              key_function=self.timer.unpause,
+                              text_size= self.text_size
                               )
         text_edit.setStyleSheet("""margin: 100px 50px 100px 50px
             ; border-radius: 20px;
@@ -187,9 +189,9 @@ class MainWindow(QMainWindow):
             confetti.start_firework(self.width() // 2, self.height() // 2)
             title_text.reset()
 
-        title_text.end_type_func = complete_title
+        title_text.end_type_func = complete_title()
 
-        title_text.setFont(QFont("Times", 100))
+        title_text.setFont(QFont("Times", self.text_size))
         title_text.setStyleSheet(f"color: white;background-color: {self.backgroundColour}")
         title_text.setAlignment(Qt.AlignCenter)
 
@@ -253,6 +255,7 @@ class MainWindow(QMainWindow):
         font = QFont("Times", value)
 
         self.current_widget_page.setFont(font)
+        
 
     def set_word_count(self, value):
         print("set word count to ", value)
@@ -264,7 +267,7 @@ class MainWindow(QMainWindow):
         print("restart?")
 
     def add_file_menu(self, menu_bar):
-        # layout
+        # layouts
         layout = QVBoxLayout()
 
         # add menu button
@@ -294,7 +297,7 @@ class MainWindow(QMainWindow):
 
     def show_text_size(self):
         font_icon = self.make_icon("assets/font_icon.png")
-        text_window = SliderWindow(self, (10, 18), self.text_size,
+        text_window = SliderWindow(self, (32, 80), self.text_size,
                                    "Text Size", self.set_text_size,
                                    font_icon)
         text_window.show()
@@ -366,13 +369,15 @@ class MainWindow(QMainWindow):
 
     def add_base_menu_items(self, menu_bar):
 
+        exit_action = QAction(self.make_icon("assets/red_exit_icon.png"), "Exit", self)
+        exit_action.triggered.connect(self.close)
+        menu_bar.addAction(exit_action)
+
+        menu_bar.addSeparator()
+
         home_action = QAction(self.make_icon("assets/home_icon.png"), "Home", self)
         home_action.triggered.connect(self.enter_home)
         menu_bar.addAction(home_action)
-
-        exit_action = QAction(self.make_icon("assets/exit_icon.png"), "Exit", self)
-        exit_action.triggered.connect(self.close)
-        menu_bar.addAction(exit_action)
 
         help_action = QAction(self.make_icon("assets/help_icon.png"), "Exit", self)
         help_action.triggered.connect(self.help)
