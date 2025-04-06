@@ -139,20 +139,18 @@ class MainWindow(QMainWindow):
         final_accuracy = round(accuracy, 1)
 
         wpm = (correct / 6) * (final_accuracy / 100) / minutes_taken
-        score = round(wpm)
 
-        return round(final_accuracy, 2), round(wpm), round(score, 1)
+        return round(final_accuracy, 2), round(wpm)
 
     def finish_typing(self, typing: TypingBox):
         self.timeout()
 
     def timeout(self):
         # calculate statistics
-        accuracy, wpm, score = self.get_statistics()
+        accuracy, wpm= self.get_statistics()
 
         print("Final accuracy: " + str(accuracy))
         print("Final wpm: " + str(wpm))
-        print("Final score: " + str(score))
 
         # update the difficult words
         new_difficult_words = self.current_widget_page.difficultWords.copy()
@@ -161,7 +159,7 @@ class MainWindow(QMainWindow):
         print(self.difficultWords)
 
         # go back to the home screen
-        self.enter_home(accuracy, wpm, score)
+        self.enter_home(accuracy, wpm)
 
     def make_type_box_title(self, home_layout):
         self.timer.pause()
@@ -198,13 +196,11 @@ class MainWindow(QMainWindow):
         # focus on the title widget once it has loaded
         QTimer.singleShot(0, title_text.setFocus)
 
-    def make_data_display_boxes(self, home_layout, accuracy=None, wpm=None, score=None):
+    def make_data_display_boxes(self, home_layout, accuracy=None, wpm=None):
         if accuracy is None:
             accuracy = "100"
         if wpm is None:
             wpm = "N/A"
-        if score is None:
-            score = "N/A"
 
         accuracy_text = QLabel(str(accuracy)+"%", self)
         accuracy_text.setFont(QFont("Times", 50))
@@ -214,20 +210,16 @@ class MainWindow(QMainWindow):
         wpm_text.setFont(QFont("Times", 50))
         wpm_text.setAlignment(Qt.AlignCenter)
 
-        score_text = QLabel("Score: "+str(score), self)
-        score_text.setFont(QFont("Times", 50))
-        score_text.setAlignment(Qt.AlignCenter)
 
         home_layout.addWidget(accuracy_text)
         home_layout.addWidget(wpm_text)
-        home_layout.addWidget(score_text)
 
-    def enter_home(self, accuracy=None, wpm=None, score=None):
+    def enter_home(self, accuracy=None, wpm=None):
         # home screen
         home_layout = QVBoxLayout()
         # title and data displays
         self.make_type_box_title(home_layout)
-        self.make_data_display_boxes(home_layout, accuracy, wpm, score)
+        self.make_data_display_boxes(home_layout, accuracy, wpm)
 
         # typing game
         typing_button = QPushButton("Typing Frenzy", self)
