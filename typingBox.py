@@ -172,8 +172,8 @@ class TypingBox(QTextEdit):
                         self.difficultWords.append(current_word)
                         
                     #Getting rid of words at the start of the list. 
-                    if len(self.difficultWords) >= 15:
-                        while len(self.difficultWords) > 15:
+                    if len(self.difficultWords) >= 30:
+                        while len(self.difficultWords) > 30:
                             self.difficultWords.pop(0)
                     
             
@@ -199,7 +199,7 @@ class TypingBox(QTextEdit):
                 # cursor.setPosition(self.pos + 1)
                 cursor.movePosition(cursor.MoveOperation.Right)
                 self.pos += 1
-        except TypeError:
+        except (TypeError, IndexError):
             pass
 
         if self.pos == len(self._textToType):
