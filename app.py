@@ -109,7 +109,7 @@ class MainWindow(QMainWindow):
         text_edit.setStyleSheet("""margin: 100px 50px 100px 50px
             ; border-radius: 20px;
             border: 2px solid black;
-            background-color: palette(base)""")
+            background-color: #5475A0""")
         self.setCentralWidget(text_edit)
 
         self.timer.show()
