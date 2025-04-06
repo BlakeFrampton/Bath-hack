@@ -173,16 +173,20 @@ class TypingBox(QTextEdit):
                     if len(self.difficultWords) >= 15:
                         while len(self.difficultWords) > 15:
                             self.difficultWords.pop(0)
+                    
+            
+                    if "hTypesmith" in self.difficultWords: 
+                        self.difficultWords.remove("hTypesmith")
 
-                    print("start: " + start)
-                    print("end: " +end)
-                    print("curr word: " + current_word)
+                    if "Typesmith" in self.difficultWords: 
+                        self.difficultWords.remove("Typesmith")
+
+
 
                 self.mistakes += 1
                 self.streak = 0
                 incorrectFontColour = "#D9818A"
                 format.setForeground(QBrush(QColor(incorrectFontColour)))
-                print("delete char")
                 cursor.deleteChar()
                 self.typed += e.text()
                 cursor.setCharFormat(format)
@@ -193,7 +197,6 @@ class TypingBox(QTextEdit):
                 cursor.setPosition(self.pos + 1)
                 self.pos += 1
         except TypeError:
-            print("catch")
             pass
 
         if self.pos == len(self._textToType):
