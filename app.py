@@ -69,7 +69,7 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(f'QMainWindow {{background: {self.backgroundColour}}}')
 
         # saves the current page
-        self.timer = Timer(parent=self, runtime_seconds=30, position=(600, 0), timeout=self.timeout)
+        self.timer = Timer(parent=self, runtime_seconds=30, position=(650, 0), timeout=self.timeout)
         self.timer.pause()
         self.timer.hide()
 
@@ -359,6 +359,13 @@ class MainWindow(QMainWindow):
             else:
                 print(f"No {style_type} entered.")
 
+    def help(self):
+        pic = QLabel(self)
+        pad = 50
+        pic.setGeometry(pad, pad, self.width() - 2 * pad, self.height() - 2 * pad)
+        pic.setPixmap(QPixmap("assets/FingerplacementGuide.png").scaled(self.width() - 2 * pad, self.height() - 2 * pad))
+        pic.show()
+
     def add_base_menu_items(self, menu_bar):
 
         home_action = QAction(self.make_icon("assets/home_icon.png"), "Home", self)
@@ -368,6 +375,10 @@ class MainWindow(QMainWindow):
         exit_action = QAction(self.make_icon("assets/exit_icon.png"), "Exit", self)
         exit_action.triggered.connect(self.close)
         menu_bar.addAction(exit_action)
+
+        help_action = QAction(self.make_icon("assets/help_icon.png"), "Exit", self)
+        help_action.triggered.connect(self.help)
+        menu_bar.addAction(help_action)
 
         menu_bar.addSeparator()
 
