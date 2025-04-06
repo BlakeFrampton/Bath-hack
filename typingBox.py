@@ -8,11 +8,13 @@ from dotenv import load_dotenv
 
 class TypingBox(QTextEdit):
 
-    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="computer science hackathon", use_text="", key_function = None, difficultWords = ["Bath Hack", "coding"], **_):
+    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="A hackathon at the Uni of Bath called Bath Hack. This does not take place in a bath. We are in the city of Bath", use_text="", key_function = None, difficultWords = ["Bath Hack", "coding"], **_):
         super().__init__()
 
-        backgroundColour = "#5475A0"
-        self.setStyleSheet(f'background-color: {backgroundColour}')
+        # backgroundColour = "#5475A0"
+        backgroundColour = "#110000"
+        # self.setStyleSheet(f'QTextEdit {{background-color: {backgroundColour}}}')
+        self.setTextBackgroundColor(backgroundColour)
         self.defaultFontColour = "#A7F1CE"
         self.setTextColor(QColor(self.defaultFontColour))  #Default font color
 
