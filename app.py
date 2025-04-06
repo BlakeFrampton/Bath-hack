@@ -76,6 +76,7 @@ class MainWindow(QMainWindow):
         # settings
         self.volume = 50
         self.text_size = 15
+        self.runtime = 30
 
         # text generation settings
         self.word_count = 50
@@ -94,7 +95,7 @@ class MainWindow(QMainWindow):
         # text = "Some text about catapults text"
         text = ""
         text_edit = TypingBox(
-                              self.timeout,
+                              self.finish_typing,
                               self.timer,
                               self.word_count,
                               self.generation_type,
@@ -110,7 +111,7 @@ class MainWindow(QMainWindow):
 
         self.timer.show()
         self.timer.timeout_function = self.timeout
-        self.timer.runtime_seconds = 6  # one minute to get through the test
+        self.timer.runtime_seconds = self.runtime  # one minute to get through the test
         self.timer.restart_on_timeout = False
         self.timer.restart()
         self.timer.pause()
@@ -133,13 +134,22 @@ class MainWindow(QMainWindow):
 
         return round(final_accuracy, 2), round(wpm), round(score, 1)
 
-    def timeout(self, difficultWords):
+    def finish_typing(self):
+        self.timeout()
+
+    def timeout(self):
         # calculate statistics
         accuracy, wpm, score = self.get_statistics()
 
         print("Final accuracy: " + str(accuracy))
         print("Final wpm: " + str(wpm))
         print("Final score: " + str(score))
+
+        # update the difficult words
+        new_difficult_words = self.current_widget_page.difficultWords.copy()
+        self.difficultWords = list(set(self.difficultWords + new_difficult_words))
+
+        print(self.difficultWords)
 
         # go back to the home screen
         self.enter_home(accuracy, wpm, score)
@@ -154,15 +164,13 @@ class MainWindow(QMainWindow):
         # title_text.setGeometry(0, 0, self.width(), 20)
 
         def timeout_func():
-            print("timeout?")
-            title_text.backspace()
+            if title_text.textCursor().position() > 0:
+                title_text.backspace()
 
         self.timer.timeout_function = timeout_func
         self.timer.unpause()
         self.timer.restart()
         self.timer.show()
-
-        print(self.timer.paused, self.timer.elapsed_time, self.timer.runtime_seconds)
 
         title_text.end_type_func = title_text.reset
 
@@ -202,9 +210,7 @@ class MainWindow(QMainWindow):
     def enter_home(self, accuracy=None, wpm=None, score=None):
         # home screen
         home_layout = QVBoxLayout()
-        # title
-        # title_text = QLabel("Typesmith", self)
-
+        # title and data displays
         self.make_type_box_title(home_layout)
         self.make_data_display_boxes(home_layout, accuracy, wpm, score)
 
@@ -221,9 +227,6 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(home_screen)
         self.current_widget_page = home_screen
-
-        self.timer.pause()
-        self.timer.hide()
 
     def set_volume(self, value):
         print("set volume to", value)

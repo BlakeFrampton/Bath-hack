@@ -55,7 +55,6 @@ class Timer:
         total_seconds = self.runtime_seconds % 60
 
         if self.elapsed_time < self.runtime_seconds and not self.paused:
-            print("hi1")
             self.elapsed_time += 1
 
             minutes = self.elapsed_time // 60
@@ -64,7 +63,6 @@ class Timer:
             self.timer_label.setText(f"{minutes:02}:{seconds:02} / {total_minutes:02}:{total_seconds:02}")  # Format as MM:SS
             # check for the timer ending
             if self.elapsed_time >= self.runtime_seconds:
-                print("hi2")
                 self.timer_label.setText(f"{total_minutes:02}:{total_seconds:02} / {total_minutes:02}:{total_seconds:02}")  # Format as MM:SS
                 self.timeout()
 

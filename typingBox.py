@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 class TypingBox(QTextEdit):
 
-    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="computer science hackathon", use_text="", key_function = None, difficultWords = [], difficultScores = [], **_):
+    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="computer science hackathon", use_text="", key_function = None, difficultWords = None, difficultScores = None, **_):
         super().__init__()
 
         backgroundColour = "#5475A0"
@@ -21,8 +21,8 @@ class TypingBox(QTextEdit):
         self.mistakes = 0
         self.correct = 0
         self.typed = ""
-        self.difficultWords = difficultWords
-        self.difficultScores = difficultScores
+        self.difficultWords = [] if difficultWords is None else difficultWords
+        self.difficultScores = [] if difficultScores is None else difficultScores
 
         if use_text == "":
             textToType = self.getText(word_count, generation_type, generation_type_content, self.difficultWords)
@@ -67,7 +67,7 @@ class TypingBox(QTextEdit):
 
 
         # call the function for when the typing is finished
-        self.end_type_func(self.difficultWords)
+        self.end_type_func()
 
     def set_font(self, font):
         self.setFont(font)
@@ -101,7 +101,6 @@ class TypingBox(QTextEdit):
 
         self.key_function()
 
-        print("before try")
         try:
             if e.text() == self._textToType[self.pos]:  # If input is correct
                 correctFontColour = "#3EE094"
@@ -152,7 +151,7 @@ class TypingBox(QTextEdit):
                     post = self.pos + 1
                     endFound = False 
                     end = ""
-                    while endFound != True:
+                    while not endFound and post < len(self._textToType):
                         if self.pos == len(self._textToType) -1: 
                             end = end + self._textToType[post]
                             endFound = True 
