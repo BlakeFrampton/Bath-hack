@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 class TypingBox(QTextEdit):
 
-    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="computer science hackathon", use_text="", key_function = None, difficultWords = None, difficultScores = None, **_):
+    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="This coding hackathon called Bath Hack", use_text="", key_function = None, difficultWords = ["Bath Hack", "coding"], difficultScores = None, **_):
         super().__init__()
 
         backgroundColour = "#5475A0"
