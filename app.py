@@ -75,6 +75,8 @@ class MainWindow(QMainWindow):
         self.timer.pause()
         self.timer.hide()
 
+        self.timerDisabled = False
+
         self.current_widget_page = None
 
         self.show_help = False
