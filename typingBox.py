@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 class TypingBox(QTextEdit):
 
-    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="computer science hackathon", use_text="", key_function = None, difficultWords = None, difficultScores = None, **_):
+    def __init__(self, end_type_func, timer, word_count=1, generation_type="theme", generation_type_content="computer science hackathon", use_text="", key_function = None, difficultWords = None, **_):
         super().__init__()
 
         backgroundColour = "#5475A0"
@@ -22,7 +22,6 @@ class TypingBox(QTextEdit):
         self.correct = 0
         self.typed = ""
         self.difficultWords = [] if difficultWords is None else difficultWords
-        self.difficultScores = [] if difficultScores is None else difficultScores
 
         if use_text == "":
             textToType = self.getText(word_count, generation_type, generation_type_content, self.difficultWords)
@@ -165,19 +164,19 @@ class TypingBox(QTextEdit):
                     current_word = start + self._textToType[self.pos] + end
 
                     if current_word in self.difficultWords:
-                        index = self.difficultWords.index(current_word)
-                        before = self.difficultScores[index]
-                        #Change 
-                        self.difficultScores[index] = before - 3
+                       self.difficultWords.remove(current_word)
+                       self.difficultWords.append(current_word)
                     else:
                         self.difficultWords.append(current_word)
-                        self.difficultScores.append(-3)
-                        self.newDiffWords.append(current_word)
-                    
+                        
+                    #Getting rid of words at the start of the list. 
+                    if len(self.difficultWords) >= 15:
+                        while len(self.difficultWords) > 15:
+                            self.difficultWords.pop(0)
+
                     print("start: " + start)
                     print("end: " +end)
                     print("curr word: " + current_word)
-
 
                 self.mistakes += 1
                 self.streak = 0
