@@ -185,6 +185,14 @@ class TypingBox(QTextEdit):
                     if "Typesmith" in self.difficultWords:
                         self.difficultWords.remove("Typesmith")
 
+                    #Remove anything non alphaneumeric 
+                    for i in self.difficultWords:
+                        if i.isalpha():
+                            continue 
+                        else:
+                            self.difficultWords.remove(i)
+
+
 
 
                 self.mistakes += 1
