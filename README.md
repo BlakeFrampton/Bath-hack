@@ -36,7 +36,6 @@ Communication with the OpenAI API is very simple, and token cost is surprisingly
 We have also learned that developing as part of a team allows for much faster development and a great environment for ideation and implementation.
 
 ## What's next for TypeSmith
-Implementing accessibility futures such as a colour blind mode, uploading files for notes, and reviewing previous results.
 <ul>
 <li>Accessibility futures such as a colour blind mode</li>
 <li>Uploading notes files to be summarised, rather than pasting in text</li>
